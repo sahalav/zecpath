@@ -12,12 +12,27 @@ class JobListAPI(APIView):
         return Response(serializer.data)
 
 # ✅ 2. Job Create API
+from rest_framework.permissions import IsAuthenticated
+
 class JobCreateAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
+
+        # ROLE CHECK
+        if request.user.role != "employer":
+            return Response(
+                {"error": "Only employers can create jobs"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         serializer = JobSerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # ✅ 3. Test API
