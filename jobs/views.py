@@ -1,14 +1,65 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+
+# ✅ 1. Job List API
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .models import Job
 from .serializers import JobSerializer
 
-# ✅ 1. Job List API
+
 class JobListAPI(APIView):
+
     def get(self, request):
-        jobs = Job.objects.all()
+
+        jobs = Job.objects.filter(is_active=True)
+
+        # Featured jobs
+        featured = request.GET.get('featured')
+
+        if featured == 'true':
+            jobs = jobs.filter(is_featured=True)
+
+        # Latest jobs
+        latest = request.GET.get('latest')
+
+        if latest == 'true':
+            jobs = jobs.order_by('-created_at')
+
+        # Skill search
+        skills = request.GET.get('skills')
+
+        if skills:
+            jobs = jobs.filter(skills__icontains=skills)
+
+        # Location filter
+        location = request.GET.get('location')
+
+        if location:
+            jobs = jobs.filter(location__icontains=location)
+
+        # Salary filter
+        salary = request.GET.get('salary')
+
+        if salary:
+            jobs = jobs.filter(salary__gte=salary)
+
+        # Experience filter
+        experience = request.GET.get('experience')
+
+        if experience:
+            jobs = jobs.filter(experience__gte=experience)
+
+        # Job type filter
+        job_type = request.GET.get('job_type')
+
+        if job_type:
+            jobs = jobs.filter(job_type=job_type)
+
         serializer = JobSerializer(jobs, many=True)
+
         return Response(serializer.data)
 
 # ✅ 2. Job Create API
