@@ -6,8 +6,9 @@ from rest_framework import status
 # ✅ 1. Job List API
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Job
-from .serializers import JobSerializer
+from .models import Job,Application
+from .serializers import JobSerializer,ApplicationSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class JobListAPI(APIView):
@@ -111,3 +112,62 @@ class JobDeleteAPI(APIView):
 
         job.delete()
         return Response({"message": "Deleted successfully"})
+class ApplyJobAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, job_id):
+
+        # Candidate only
+        if request.user.role != "candidate":
+            return Response(
+                {"error": "Only candidates can apply"},
+                status=403
+            )
+
+        # Get job
+        try:
+            job = Job.objects.get(id=job_id)
+        except Job.DoesNotExist:
+            return Response(
+                {"error": "Job not found"},
+                status=404
+            )
+
+        # Duplicate prevention
+        already_applied = Application.objects.filter(
+            candidate=request.user,
+            job=job
+        ).exists()
+
+        if already_applied:
+            return Response(
+                {"error": "Already applied"},
+                status=400
+            )
+
+        # Create application
+        application = Application.objects.create(
+            candidate=request.user,
+            job=job
+        )
+
+        serializer = ApplicationSerializer(application)
+
+        return Response(serializer.data, status=201)
+class MyApplicationsAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        applications = Application.objects.filter(
+            candidate=request.user
+        )
+
+        serializer = ApplicationSerializer(
+            applications,
+            many=True
+        )
+
+        return Response(serializer.data)

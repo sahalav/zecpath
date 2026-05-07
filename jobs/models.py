@@ -1,6 +1,9 @@
 from django.db import models
+from accounts.models import User
+
 
 class Job(models.Model):
+
     JOB_TYPE_CHOICES = (
         ('full_time', 'Full Time'),
         ('part_time', 'Part Time'),
@@ -17,7 +20,10 @@ class Job(models.Model):
     salary = models.IntegerField()
     experience = models.IntegerField()
 
-    job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
+    job_type = models.CharField(
+        max_length=20,
+        choices=JOB_TYPE_CHOICES
+    )
 
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
@@ -26,3 +32,33 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Application(models.Model):
+
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('shortlisted', 'Shortlisted'),
+        ('rejected', 'Rejected'),
+    )
+
+    candidate = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    applied_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.candidate.email} - {self.job.title}"
