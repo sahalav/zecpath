@@ -103,6 +103,7 @@ class JobUpdateAPI(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+    
 class JobDeleteAPI(APIView):
     def delete(self, request, id):
         try:
@@ -155,19 +156,55 @@ class ApplyJobAPI(APIView):
         serializer = ApplicationSerializer(application)
 
         return Response(serializer.data, status=201)
-class MyApplicationsAPI(APIView):
+class UpdateApplicationStatusAPI(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def post(self, request, application_id):
 
-        applications = Application.objects.filter(
-            candidate=request.user
-        )
+        # Employer only
+        if request.user.role != "employer":
+            return Response(
+                {"error": "Only employers allowed"},
+                status=403
+            )
 
-        serializer = ApplicationSerializer(
-            applications,
-            many=True
-        )
+        try:
+            application = Application.objects.get(
+                id=application_id
+            )
 
-        return Response(serializer.data)
+        except Application.DoesNotExist:
+            return Response(
+                {"error": "Application not found"},
+                status=404
+            )
+
+        new_status = request.data.get('status')
+
+        # Workflow validation
+        if application.status == 'rejected':
+            return Response({
+                "error": "Rejected applications cannot move further"
+            })
+
+        valid_statuses = [
+            'applied',
+            'shortlisted',
+            'interview',
+            'selected',
+            'rejected'
+        ]
+
+        if new_status not in valid_statuses:
+            return Response(
+                {"error": "Invalid status"}
+            )
+
+        application.status = new_status
+        application.save()
+
+        return Response({
+            "message": "Status updated",
+            "new_status": application.status
+        })

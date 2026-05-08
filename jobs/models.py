@@ -37,10 +37,12 @@ class Job(models.Model):
 class Application(models.Model):
 
     STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('shortlisted', 'Shortlisted'),
-        ('rejected', 'Rejected'),
-    )
+    ('applied', 'Applied'),
+    ('shortlisted', 'Shortlisted'),
+    ('interview', 'Interview Scheduled'),
+    ('selected', 'Selected'),
+    ('rejected', 'Rejected'),
+)
 
     candidate = models.ForeignKey(
         User,
@@ -55,7 +57,7 @@ class Application(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='pending'
+        default='applied'
     )
 
     applied_date = models.DateTimeField(auto_now_add=True)
