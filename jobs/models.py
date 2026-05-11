@@ -29,6 +29,11 @@ class Job(models.Model):
     is_featured = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    employer = models.ForeignKey(
+    User,
+    on_delete=models.CASCADE,
+    limit_choices_to={'role': 'employer'}
+)
 
     def __str__(self):
         return self.title
@@ -64,3 +69,4 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate.email} - {self.job.title}"
+    

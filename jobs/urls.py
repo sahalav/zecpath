@@ -7,7 +7,8 @@ from .views import (
     JobUpdateAPI,
     JobDeleteAPI,
     ApplyJobAPI,
-    UpdateApplicationStatusAPI
+    UpdateApplicationStatusAPI,EmployerJobsAPI,
+    ApplicantsAPI
 )
 
 urlpatterns = [
@@ -29,5 +30,7 @@ urlpatterns = [
         'application-status/<int:application_id>/',
         UpdateApplicationStatusAPI.as_view()
     ),
+    path('my-jobs/', EmployerJobsAPI.as_view()),
+    path('applicants/', ApplicantsAPI.as_view()),
 
 ]

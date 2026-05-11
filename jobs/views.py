@@ -82,7 +82,7 @@ class JobCreateAPI(APIView):
         serializer = JobSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(employer=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -92,16 +92,42 @@ class TestAPI(APIView):
     def get(self, request):
         return Response({"message": "Hello Sahala 😊"})
 class JobUpdateAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
     def put(self, request, id):
+
+        # Employer only
+        if request.user.role != "employer":
+            return Response({
+                "error": "Only employers allowed"
+            }, status=403)
+
         try:
             job = Job.objects.get(id=id)
-        except Job.DoesNotExist:
-            return Response({"error": "Not found"}, status=404)
 
-        serializer = JobSerializer(job, data=request.data)
+        except Job.DoesNotExist:
+            return Response({
+                "error": "Job not found"
+            }, status=404)
+
+        # Ownership validation
+        if job.employer != request.user:
+            return Response({
+                "error": "Unauthorized"
+            }, status=403)
+
+        serializer = JobSerializer(
+            job,
+            data=request.data,
+            partial=True
+        )
+
         if serializer.is_valid():
             serializer.save()
+
             return Response(serializer.data)
+
         return Response(serializer.errors)
     
 class JobDeleteAPI(APIView):
@@ -208,3 +234,60 @@ class UpdateApplicationStatusAPI(APIView):
             "message": "Status updated",
             "new_status": application.status
         })
+class EmployerJobsAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        if request.user.role != "employer":
+            return Response({
+                "error": "Only employers allowed"
+            })
+
+        jobs = Job.objects.filter(
+            employer=request.user
+        )
+
+        serializer = JobSerializer(
+            jobs,
+            many=True
+        )
+
+        return Response(serializer.data)
+class ApplicantsAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        # Employer only
+        if request.user.role != "employer":
+            return Response({
+                "error": "Only employers allowed"
+            }, status=403)
+
+        applications = Application.objects.all()
+
+        # Filter by status
+        status_filter = request.GET.get('status')
+
+        if status_filter:
+            applications = applications.filter(
+                status=status_filter
+            )
+
+        # Search candidate
+        search = request.GET.get('search')
+
+        if search:
+            applications = applications.filter(
+                candidate__email__icontains=search
+            )
+
+        serializer = ApplicationSerializer(
+            applications,
+            many=True
+        )
+
+        return Response(serializer.data)
