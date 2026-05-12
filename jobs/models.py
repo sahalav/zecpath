@@ -69,4 +69,21 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate.email} - {self.job.title}"
-    
+class SavedJob(models.Model):
+
+    candidate = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
+    )
+
+    saved_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.candidate.email} saved {self.job.title}"

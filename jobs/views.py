@@ -1,5 +1,4 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+
 from rest_framework import status
 
 
@@ -7,7 +6,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Job,Application
-from .serializers import JobSerializer,ApplicationSerializer
+from .serializers import JobSerializer,ApplicationSerializer,SavedJob,SavedJobSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -287,6 +286,97 @@ class ApplicantsAPI(APIView):
 
         serializer = ApplicationSerializer(
             applications,
+            many=True
+        )
+
+        return Response(serializer.data)
+class AppliedJobsAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        # Candidate only
+        if request.user.role != "candidate":
+            return Response({
+                "error": "Only candidates allowed"
+            }, status=403)
+
+        applications = Application.objects.filter(
+            candidate=request.user
+        )
+
+        serializer = ApplicationSerializer(
+            applications,
+            many=True
+        )
+
+        return Response(serializer.data)
+class SaveJobAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, job_id):
+
+        if request.user.role != "candidate":
+            return Response({
+                "error": "Only candidates allowed"
+            }, status=403)
+
+        job = Job.objects.get(id=job_id)
+
+        SavedJob.objects.create(
+            candidate=request.user,
+            job=job
+        )
+
+        return Response({
+            "message": "Job saved"
+        })
+class SaveJobAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, job_id):
+
+        if request.user.role != "candidate":
+            return Response({
+                "error": "Only candidates allowed"
+            }, status=403)
+
+        try:
+            job = Job.objects.get(id=job_id)
+
+        except Job.DoesNotExist:
+            return Response({
+                "error": "Job not found"
+            }, status=404)
+
+        saved_job = SavedJob.objects.create(
+            candidate=request.user,
+            job=job
+        )
+
+        serializer = SavedJobSerializer(saved_job)
+
+        return Response(serializer.data)
+class RecommendationAPI(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        if request.user.role != "candidate":
+            return Response({
+                "error": "Only candidates allowed"
+            }, status=403)
+
+        jobs = Job.objects.filter(
+            skills__icontains="Python"
+        )
+
+        serializer = JobSerializer(
+            jobs,
             many=True
         )
 
