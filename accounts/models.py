@@ -41,6 +41,10 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+    is_approved = models.BooleanField(default=False)
+    is_blocked = models.BooleanField(default=False)
+    is_flagged = models.BooleanField(default=False)
+    
 
 
 class CandidateProfile(models.Model):

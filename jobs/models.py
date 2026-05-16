@@ -87,3 +87,38 @@ class SavedJob(models.Model):
 
     def __str__(self):
         return f"{self.candidate.email} saved {self.job.title}"
+class AuditLog(models.Model):
+
+    ACTION_CHOICES = (
+        ('approve_employer', 'Approve Employer'),
+        ('block_user', 'Block User'),
+        ('delete_job', 'Delete Job'),
+        ('update_status', 'Update Status'),
+    )
+
+    admin = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    action = models.CharField(
+        max_length=50,
+        choices=ACTION_CHOICES
+    )
+
+    target_user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='target_user'
+    )
+
+    description = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.admin.email} - {self.action}"
