@@ -12,7 +12,7 @@ from .views import (
     delete_candidate_profile,
     upload_resume,
     UserListView, ApproveEmployerAPI,
-    FlaggedUsersAPI,FlagUserAPI
+    FlaggedUsersAPI,FlagUserAPI,ResumeParserAPI
     
 
 )
@@ -46,5 +46,9 @@ path(
 path(
     'flag-user/<int:user_id>/',
     FlagUserAPI.as_view()
+),
+path(
+    'resume-parse/',
+    ResumeParserAPI.as_view()
 ),
 ]

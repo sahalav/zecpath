@@ -7,10 +7,14 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
+import PyPDF2
+import pdfplumber
+import docx
 
+from io import BytesIO
 from services.auth_service import create_user
 
-from .models import CandidateProfile, User
+from .models import CandidateProfile, User, Resume
 from .serializers import (
     SignupSerializer,
     CandidateProfileSerializer,
@@ -360,3 +364,69 @@ class FlaggedUsersAPI(APIView):
             })
 
         return Response(data)
+class ResumeParserAPI(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        file = request.FILES.get('file')
+
+        if not file:
+
+            return Response({
+                "error": "No file uploaded"
+            }, status=400)
+
+        extracted_text = ""
+
+        # PDF Parsing
+        if file.name.endswith('.pdf'):
+
+            pdf_reader = PyPDF2.PdfReader(file)
+
+            for page in pdf_reader.pages:
+
+                text = page.extract_text()
+
+                if text:
+                    extracted_text += text + "\n"
+
+        # DOCX Parsing
+        elif file.name.endswith('.docx'):
+
+            document = docx.Document(file)
+
+            for para in document.paragraphs:
+
+                extracted_text += para.text + "\n"
+
+        else:
+
+            return Response({
+                "error": "Only PDF and DOCX supported"
+            }, status=400)
+
+        # Cleaning
+        cleaned_text = " ".join(
+            extracted_text.split()
+        )
+
+        resume = Resume.objects.create(
+
+            user=request.user,
+
+            file=file,
+
+            extracted_text=cleaned_text
+        )
+
+        return Response({
+
+            "message": "Resume parsed successfully",
+
+            "resume_id": resume.id,
+
+            "cleaned_text": cleaned_text
+        })

@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import CandidateProfile, EmployerProfile
 from .models import User
+from .models import Resume
 
 User = get_user_model()
 
@@ -38,3 +39,13 @@ class UserListSerializer(serializers.ModelSerializer):
  class Meta:
         model = User
         fields = ['id', 'email', 'role', 'phone', 'is_verified']
+
+
+
+class ResumeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Resume
+
+        fields = '__all__'
