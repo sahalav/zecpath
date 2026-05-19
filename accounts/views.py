@@ -10,6 +10,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 import PyPDF2
 import pdfplumber
 import docx
+import re
 
 from io import BytesIO
 from services.auth_service import create_user
@@ -381,7 +382,9 @@ class ResumeParserAPI(APIView):
 
         extracted_text = ""
 
+        # -------------------------
         # PDF Parsing
+        # -------------------------
         if file.name.endswith('.pdf'):
 
             pdf_reader = PyPDF2.PdfReader(file)
@@ -393,7 +396,9 @@ class ResumeParserAPI(APIView):
                 if text:
                     extracted_text += text + "\n"
 
+        # -------------------------
         # DOCX Parsing
+        # -------------------------
         elif file.name.endswith('.docx'):
 
             document = docx.Document(file)
@@ -408,11 +413,69 @@ class ResumeParserAPI(APIView):
                 "error": "Only PDF and DOCX supported"
             }, status=400)
 
-        # Cleaning
+        # -------------------------
+        # Cleaning & Normalization
+        # -------------------------
         cleaned_text = " ".join(
             extracted_text.split()
         )
 
+        # -------------------------
+        # Skill Extraction
+        # -------------------------
+        SKILLS = [
+            "Python",
+            "Django",
+            "SQL",
+            "AWS",
+            "REST API",
+            "Java",
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "PostgreSQL"
+        ]
+
+        found_skills = []
+
+        for skill in SKILLS:
+
+            if skill.lower() in cleaned_text.lower():
+
+                found_skills.append(skill)
+
+        # -------------------------
+        # Experience Extraction
+        # -------------------------
+        experience = re.findall(
+       r'(\d+\+?\s+(?:years?|yrs?))',
+    cleaned_text,
+    re.IGNORECASE
+)
+
+        # -------------------------
+        # Education Extraction
+        # -------------------------
+        education_keywords = [
+            "BTech",
+            "MTech",
+            "MBA",
+            "MCA",
+            "BSc",
+            "BCA"
+        ]
+
+        education = []
+
+        for edu in education_keywords:
+
+            if edu.lower() in cleaned_text.lower():
+
+                education.append(edu)
+
+        # -------------------------
+        # Store Resume
+        # -------------------------
         resume = Resume.objects.create(
 
             user=request.user,
@@ -422,11 +485,25 @@ class ResumeParserAPI(APIView):
             extracted_text=cleaned_text
         )
 
+        # -------------------------
+        # Structured Resume JSON
+        # -------------------------
+        structured_resume = {
+
+            "skills": found_skills,
+
+            "experience": experience,
+
+            "education": education
+        }
+
         return Response({
 
             "message": "Resume parsed successfully",
 
             "resume_id": resume.id,
+
+            "structured_resume": structured_resume,
 
             "cleaned_text": cleaned_text
         })
