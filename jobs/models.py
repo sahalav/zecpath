@@ -122,3 +122,20 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.admin.email} - {self.action}"
+class ATSScore(models.Model):
+
+    candidate = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
+    )
+
+    score = models.FloatField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )

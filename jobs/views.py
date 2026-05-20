@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from accounts.models import User
+from accounts.models import Resume
+from .models import ATSScore, Job
 
 from .models import (
     Job,
@@ -651,5 +653,116 @@ class JobActivityAPI(APIView):
 
                 "is_active": job.is_active
             })
+
+        return Response(data)
+class ATSMatchAPI(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, job_id):
+
+        try:
+            resume = Resume.objects.filter(
+                user=request.user
+            ).latest('id')
+
+        except Resume.DoesNotExist:
+
+            return Response({
+                "error": "Resume not found"
+            }, status=404)
+
+        try:
+            job = Job.objects.get(id=job_id)
+
+        except Job.DoesNotExist:
+
+            return Response({
+                "error": "Job not found"
+            }, status=404)
+
+        # Resume Skills
+        resume_text = resume.extracted_text.lower()
+
+        # Job Skills
+        job_skills = [
+            "python",
+            "django",
+            "sql",
+            "aws"
+        ]
+
+        matched = []
+
+        for skill in job_skills:
+
+            if skill in resume_text:
+
+                matched.append(skill)
+
+        score = (
+            len(matched) / len(job_skills)
+        ) * 100
+
+        ATSScore.objects.create(
+
+            candidate=request.user,
+
+            job=job,
+
+            score=score
+        )
+
+        return Response({
+
+            "job": job.title,
+
+            "matched_skills": matched,
+
+            "match_percentage": score
+        })
+class RankedCandidatesAPI(APIView):
+
+    authentication_classes = [JWTAuthentication]
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        rankings = ATSScore.objects.all().order_by('-score')
+
+        data = []
+
+        rank = 1
+
+        for item in rankings:
+
+            if item.score >= 80:
+                grade = "Excellent"
+
+            elif item.score >= 60:
+                grade = "Good"
+
+            elif item.score >= 40:
+                grade = "Average"
+
+            else:
+                grade = "Poor"
+
+            data.append({
+
+                "rank": rank,
+
+                "candidate": item.candidate.email,
+
+                "job": item.job.title,
+
+                "score": item.score,
+
+                "grade": grade
+            })
+
+            rank += 1
 
         return Response(data)
