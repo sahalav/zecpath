@@ -20,7 +20,7 @@ from .views import (
     PlatformStatsAPI,
 UserGrowthAPI,
 JobActivityAPI,
-ATSMatchAPI,RankedCandidatesAPI
+ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI
 )
 
 urlpatterns = [
@@ -97,5 +97,9 @@ path(
 path(
     'ranked-candidates/',
     RankedCandidatesAPI.as_view()
+),
+path(
+    'eligibility/<int:job_id>/',
+    EligibilityAPI.as_view()
 ),
 ]

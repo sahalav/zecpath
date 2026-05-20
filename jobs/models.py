@@ -136,6 +136,7 @@ class ATSScore(models.Model):
 
     score = models.FloatField()
 
-    created_at = models.DateTimeField(
-        auto_now_add=True
+    status = models.CharField(
+        max_length=50,
+        default='pending'
     )

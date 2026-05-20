@@ -658,6 +658,7 @@ class JobActivityAPI(APIView):
 class ATSMatchAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request, job_id):
@@ -682,7 +683,7 @@ class ATSMatchAPI(APIView):
                 "error": "Job not found"
             }, status=404)
 
-        # Resume Skills
+        # Resume Text
         resume_text = resume.extracted_text.lower()
 
         # Job Skills
@@ -701,17 +702,34 @@ class ATSMatchAPI(APIView):
 
                 matched.append(skill)
 
+        # Score Calculation
         score = (
             len(matched) / len(job_skills)
         ) * 100
 
+        # Auto Status Logic
+        if score >= 80:
+
+            status_value = "shortlisted"
+
+        elif score < 40:
+
+            status_value = "rejected"
+
+        else:
+
+            status_value = "pending"
+
+        # Save ATS Score
         ATSScore.objects.create(
 
             candidate=request.user,
 
             job=job,
 
-            score=score
+            score=score,
+
+            status=status_value
         )
 
         return Response({
@@ -720,7 +738,9 @@ class ATSMatchAPI(APIView):
 
             "matched_skills": matched,
 
-            "match_percentage": score
+            "match_percentage": score,
+
+            "status": status_value
         })
 class RankedCandidatesAPI(APIView):
 
@@ -766,3 +786,34 @@ class RankedCandidatesAPI(APIView):
             rank += 1
 
         return Response(data)
+class EligibilityAPI(APIView):
+
+    authentication_classes = [JWTAuthentication]
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, job_id):
+
+        ats = ATSScore.objects.filter(
+            candidate=request.user,
+            job_id=job_id
+        ).first()
+
+        if not ats:
+
+            return Response({
+                "eligible": False
+            })
+
+        eligible = ats.score >= 60
+
+        return Response({
+
+            "candidate": request.user.email,
+
+            "job_id": job_id,
+
+            "eligible": eligible,
+
+            "score": ats.score
+        })
