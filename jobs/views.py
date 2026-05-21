@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.core.mail import send_mail
+from .models import NotificationLog
 
 from accounts.models import User
 from accounts.models import Resume
@@ -222,11 +224,29 @@ class ApplyJobAPI(APIView):
             job=job
         )
 
+        # Email Notification
+        send_mail(
+            subject='Job Application Submitted',
+            message='Your application was submitted successfully.',
+            from_email='admin@example.com',
+            recipient_list=[request.user.email],
+            fail_silently=False
+        )
+
+        # Log Entry
+        NotificationLog.objects.create(
+            user=request.user,
+            subject='Job Application Submitted',
+            message='Application submitted successfully',
+            status='sent'
+        )
+
         serializer = ApplicationSerializer(application)
 
-        return Response(serializer.data, status=201)
-
-
+        return Response(
+            serializer.data,
+            status=201
+        )
 # ✅ 7. ATS Status Update API
 class UpdateApplicationStatusAPI(APIView):
 
@@ -655,10 +675,10 @@ class JobActivityAPI(APIView):
             })
 
         return Response(data)
+
 class ATSMatchAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
-
     permission_classes = [IsAuthenticated]
 
     def post(self, request, job_id):
@@ -683,10 +703,8 @@ class ATSMatchAPI(APIView):
                 "error": "Job not found"
             }, status=404)
 
-        # Resume Text
         resume_text = resume.extracted_text.lower()
 
-        # Job Skills
         job_skills = [
             "python",
             "django",
@@ -699,15 +717,13 @@ class ATSMatchAPI(APIView):
         for skill in job_skills:
 
             if skill in resume_text:
-
                 matched.append(skill)
 
-        # Score Calculation
         score = (
             len(matched) / len(job_skills)
         ) * 100
 
-        # Auto Status Logic
+        # Auto Shortlisting Logic
         if score >= 80:
 
             status_value = "shortlisted"
@@ -720,15 +736,28 @@ class ATSMatchAPI(APIView):
 
             status_value = "pending"
 
-        # Save ATS Score
+        # Shortlist Email
+        if status_value == "shortlisted":
+
+            send_mail(
+                subject='Congratulations! Shortlisted',
+                message='You have been shortlisted.',
+                from_email='admin@example.com',
+                recipient_list=[request.user.email],
+                fail_silently=False
+            )
+
+            NotificationLog.objects.create(
+                user=request.user,
+                subject='Shortlisted',
+                message='Candidate shortlisted',
+                status='sent'
+            )
+
         ATSScore.objects.create(
-
             candidate=request.user,
-
             job=job,
-
             score=score,
-
             status=status_value
         )
 
@@ -741,7 +770,7 @@ class ATSMatchAPI(APIView):
             "match_percentage": score,
 
             "status": status_value
-        })
+        })        
 class RankedCandidatesAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -817,3 +846,33 @@ class EligibilityAPI(APIView):
 
             "score": ats.score
         })
+class NotificationLogsAPI(APIView):
+
+    authentication_classes = [JWTAuthentication]
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        logs = NotificationLog.objects.all().order_by(
+            '-created_at'
+        )
+
+        data = []
+
+        for log in logs:
+
+            data.append({
+
+                "user": log.user.email,
+
+                "subject": log.subject,
+
+                "message": log.message,
+
+                "status": log.status,
+
+                "time": log.created_at
+            })
+
+        return Response(data)

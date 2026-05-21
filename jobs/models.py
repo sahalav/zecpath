@@ -140,3 +140,23 @@ class ATSScore(models.Model):
         max_length=50,
         default='pending'
     )
+class NotificationLog(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    subject = models.CharField(
+        max_length=255
+    )
+
+    message = models.TextField()
+
+    status = models.CharField(
+        max_length=50
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )

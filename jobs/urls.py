@@ -20,7 +20,7 @@ from .views import (
     PlatformStatsAPI,
 UserGrowthAPI,
 JobActivityAPI,
-ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI
+ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI
 )
 
 urlpatterns = [
@@ -101,5 +101,9 @@ path(
 path(
     'eligibility/<int:job_id>/',
     EligibilityAPI.as_view()
+),
+path(
+    'notification-logs/',
+    NotificationLogsAPI.as_view()
 ),
 ]
