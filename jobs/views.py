@@ -337,7 +337,10 @@ class ApplicantsAPI(APIView):
                 "error": "Only employers allowed"
             }, status=403)
 
-        applications = Application.objects.all()
+        applications = Application.objects.select_related(
+    'candidate',
+    'job'
+)
 
         status_filter = request.GET.get('status')
 
@@ -374,9 +377,12 @@ class AppliedJobsAPI(APIView):
                 "error": "Only candidates allowed"
             }, status=403)
 
-        applications = Application.objects.filter(
-            candidate=request.user
-        )
+        applications = Application.objects.select_related(
+    'job'
+).filter(
+    candidate=request.user
+)
+        
 
         serializer = ApplicationSerializer(
             applications,

@@ -10,12 +10,21 @@ class Job(models.Model):
         ('internship', 'Internship'),
     )
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(
+    max_length=255,
+    db_index=True
+)
     description = models.TextField()
     company = models.CharField(max_length=255)
 
-    skills = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
+    skills = models.CharField(
+    max_length=255,
+    db_index=True
+)
+    location = models.CharField(
+    max_length=255,
+    db_index=True
+)
 
     salary = models.IntegerField()
     experience = models.IntegerField()
