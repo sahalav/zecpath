@@ -14,7 +14,7 @@ from .models import (
     Job,
     Application,
     SavedJob,
-    AuditLog
+    AuditLog,AICall
 )
 
 from .serializers import (
@@ -879,6 +879,79 @@ class NotificationLogsAPI(APIView):
                 "status": log.status,
 
                 "time": log.created_at
+            })
+
+        return Response(data)
+class EligibilityCheckAPIView(APIView):
+
+    def get(self, request, candidate_id):
+
+        ats = ATSScore.objects.filter(
+            candidate_id=candidate_id
+        ).first()
+
+        if not ats:
+            return Response({
+                "eligible": False,
+                "reason": "No ATS score found"
+            })
+
+        if ats.score >= 70:
+
+            return Response({
+                "eligible": True,
+                "score": ats.score
+            })
+
+        return Response({
+            "eligible": False,
+            "score": ats.score
+        })
+class TriggerAICallAPIView(APIView):
+
+    def post(self, request, candidate_id):
+
+        ats = ATSScore.objects.filter(
+            candidate_id=candidate_id
+        ).first()
+
+        if not ats:
+            return Response({
+                "error": "ATS score not found"
+            }, status=404)
+
+        if ats.score < 70:
+            return Response({
+                "message": "Candidate not eligible",
+                "score": ats.score
+            })
+
+        call = AICall.objects.create(
+            candidate_id=candidate_id,
+            job=ats.job,
+            status="queued"
+        )
+
+        return Response({
+            "call_id": call.id,
+            "candidate": call.candidate.email,
+            "job": call.job.title,
+            "status": call.status
+        })
+class CallStatusAPIView(APIView):
+
+    def get(self, request):
+
+        calls = AICall.objects.all()
+
+        data = []
+
+        for call in calls:
+
+            data.append({
+                "candidate": call.candidate.email,
+                "job": call.job.title,
+                "status": call.status
             })
 
         return Response(data)

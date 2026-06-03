@@ -20,7 +20,8 @@ from .views import (
     PlatformStatsAPI,
 UserGrowthAPI,
 JobActivityAPI,
-ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI
+ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
+EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView
 )
 
 urlpatterns = [
@@ -105,5 +106,18 @@ path(
 path(
     'notification-logs/',
     NotificationLogsAPI.as_view()
+),
+path(
+    'check-eligibility/<int:candidate_id>/',
+    EligibilityCheckAPIView.as_view()
+),
+path(
+    'trigger-ai-call/<int:candidate_id>/',
+    TriggerAICallAPIView.as_view()
+),
+
+path(
+    'call-status/',
+    CallStatusAPIView.as_view()
 ),
 ]

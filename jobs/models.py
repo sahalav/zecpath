@@ -169,3 +169,34 @@ class NotificationLog(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+class AICall(models.Model):
+
+    STATUS_CHOICES = (
+        ('queued', 'Queued'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    )
+
+    candidate = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='queued'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.candidate.email} - {self.status}"
