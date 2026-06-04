@@ -275,3 +275,46 @@ class CallLog(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+class QuestionTemplate(models.Model):
+
+    CATEGORY_CHOICES = (
+        ('intro', 'Introduction'),
+        ('experience', 'Experience'),
+        ('skills', 'Skills'),
+        ('availability', 'Availability'),
+        ('salary', 'Salary'),
+    )
+
+    question_text = models.TextField()
+
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES
+    )
+
+    def __str__(self):
+        return self.question_text
+class JobQuestion(models.Model):
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
+    )
+
+    question = models.ForeignKey(
+        QuestionTemplate,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.job.title}"
+class InterviewState(models.Model):
+
+    session = models.ForeignKey(
+        AIInterviewSession,
+        on_delete=models.CASCADE
+    )
+
+    current_question_index = models.IntegerField(
+        default=0
+    )
