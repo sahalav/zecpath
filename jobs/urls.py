@@ -21,7 +21,7 @@ from .views import (
 UserGrowthAPI,
 JobActivityAPI,
 ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
-EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView
+EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView
 )
 
 urlpatterns = [
@@ -119,5 +119,17 @@ path(
 path(
     'call-status/',
     CallStatusAPIView.as_view()
+),
+path(
+    'submit-answer/',
+    SubmitAnswerAPIView.as_view()
+),
+path(
+    'evaluate-answer/<int:answer_id>/',
+    EvaluateAnswerAPIView.as_view()
+),
+path(
+    'evaluation-results/',
+    EvaluationResultsAPIView.as_view()
 ),
 ]

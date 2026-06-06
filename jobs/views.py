@@ -14,7 +14,7 @@ from .models import (
     Job,
     Application,
     SavedJob,
-    AuditLog,AICall
+    AuditLog,AICall, InterviewAnswer,EvaluationResult
 )
 
 from .serializers import (
@@ -952,6 +952,101 @@ class CallStatusAPIView(APIView):
                 "candidate": call.candidate.email,
                 "job": call.job.title,
                 "status": call.status
+            })
+
+        return Response(data)
+class SubmitAnswerAPIView(APIView):
+
+    def post(self, request):
+
+        obj = InterviewAnswer.objects.create(
+
+            candidate=request.user,
+
+            question=request.data.get("question"),
+
+            answer=request.data.get("answer"),
+
+            confidence=request.data.get(
+                "confidence",
+                0
+            )
+        )
+
+        return Response({
+
+            "message": "Answer saved",
+
+            "id": obj.id
+
+        })
+class EvaluateAnswerAPIView(APIView):
+
+    def post(self, request, answer_id):
+
+        obj = InterviewAnswer.objects.get(
+            id=answer_id
+        )
+
+        answer = obj.answer.lower()
+
+        score = 0
+
+        keywords = [
+            "python",
+            "framework",
+            "django"
+        ]
+
+        matched = []
+
+        for word in keywords:
+
+            if word in answer:
+
+                score += 10
+                matched.append(word)
+
+        score += 40
+
+        score = min(score, 100)
+
+        # SAVE RESULT
+        EvaluationResult.objects.create(
+            answer=obj,
+            score=score,
+            remarks="Good Answer"
+        )
+
+        return Response({
+
+            "score": score,
+
+            "matched_keywords": matched
+
+        })
+
+class EvaluationResultsAPIView(APIView):
+
+    def get(self, request):
+
+        data = []
+
+        results = EvaluationResult.objects.all()
+
+        for item in results:
+
+            data.append({
+
+                "candidate":
+                item.answer.candidate.email,
+
+                "score":
+                item.score,
+
+                "remarks":
+                item.remarks
+
             })
 
         return Response(data)

@@ -318,3 +318,40 @@ class InterviewState(models.Model):
     current_question_index = models.IntegerField(
         default=0
     )
+class InterviewAnswer(models.Model):
+
+    candidate = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    question = models.TextField()
+
+    answer = models.TextField()
+
+    confidence = models.FloatField(
+        default=0
+    )
+
+    ai_notes = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+class EvaluationResult(models.Model):
+
+    answer = models.ForeignKey(
+        InterviewAnswer,
+        on_delete=models.CASCADE
+    )
+
+    score = models.FloatField()
+
+    remarks = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
