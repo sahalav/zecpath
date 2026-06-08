@@ -21,7 +21,7 @@ from .views import (
 UserGrowthAPI,
 JobActivityAPI,
 ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
-EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView
+EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView,ScheduleInterviewAPIView
 )
 
 urlpatterns = [
@@ -132,4 +132,8 @@ path(
     'evaluation-results/',
     EvaluationResultsAPIView.as_view()
 ),
+path(
+    'schedule-interview/<int:candidate_id>/',
+    ScheduleInterviewAPIView.as_view()
+)
 ]

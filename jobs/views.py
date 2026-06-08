@@ -14,7 +14,8 @@ from .models import (
     Job,
     Application,
     SavedJob,
-    AuditLog,AICall, InterviewAnswer,EvaluationResult
+    AuditLog,AICall, InterviewAnswer,EvaluationResult,AvailabilitySlot,
+    InterviewSchedule
 )
 
 from .serializers import (
@@ -1050,3 +1051,53 @@ class EvaluationResultsAPIView(APIView):
             })
 
         return Response(data)
+class ScheduleInterviewAPIView(APIView):
+
+    def post(self, request, candidate_id):
+
+        slot = AvailabilitySlot.objects.filter(
+            is_booked=False
+        ).first()
+
+        if not slot:
+            return Response({
+                "error": "No slots available"
+            })
+
+        ats = ATSScore.objects.filter(
+            candidate_id=candidate_id
+        ).first()
+
+        schedule = InterviewSchedule.objects.create(
+            candidate_id=candidate_id,
+            job=ats.job,
+            interview_date=slot.date,
+            interview_time=slot.start_time
+        )
+
+        slot.is_booked = True
+        slot.save()
+
+        # ✅ Email Trigger
+        send_mail(
+            subject='Interview Scheduled',
+            message=f'Your interview is scheduled on {schedule.interview_date} at {schedule.interview_time}',
+            from_email='admin@zecpath.com',
+            recipient_list=[schedule.candidate.email],
+            fail_silently=False
+        )
+
+        # ✅ Notification Log
+        NotificationLog.objects.create(
+            user=schedule.candidate,
+            subject='Interview Scheduled',
+            message='Interview scheduled successfully',
+            status='sent'
+        )
+
+        return Response({
+            "candidate": schedule.candidate.email,
+            "date": schedule.interview_date,
+            "time": schedule.interview_time,
+            "status": schedule.status
+        })

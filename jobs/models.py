@@ -355,3 +355,43 @@ class EvaluationResult(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+class InterviewSchedule(models.Model):
+
+    candidate = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
+    )
+
+    interview_date = models.DateField()
+
+    interview_time = models.TimeField()
+
+    status = models.CharField(
+        max_length=50,
+        default="scheduled"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+class AvailabilitySlot(models.Model):
+
+    employer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    date = models.DateField()
+
+    start_time = models.TimeField()
+
+    end_time = models.TimeField()
+
+    is_booked = models.BooleanField(
+        default=False
+    )
