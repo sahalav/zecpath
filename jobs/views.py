@@ -15,7 +15,7 @@ from .models import (
     Application,
     SavedJob,
     AuditLog,AICall, InterviewAnswer,EvaluationResult,AvailabilitySlot,
-    InterviewSchedule
+    InterviewSchedule,ReminderLog
 )
 
 from .serializers import (
@@ -1101,3 +1101,62 @@ class ScheduleInterviewAPIView(APIView):
             "time": schedule.interview_time,
             "status": schedule.status
         })
+class SendReminderAPIView(APIView):
+
+    def post(self, request, schedule_id):
+
+        schedule = InterviewSchedule.objects.get(
+            id=schedule_id
+        )
+
+        send_mail(
+            subject="Interview Reminder",
+
+            message=
+            f"Reminder: Interview on "
+            f"{schedule.interview_date}",
+
+            from_email="admin@zecpath.com",
+
+            recipient_list=[
+                schedule.candidate.email
+            ],
+
+            fail_silently=False
+        )
+
+        ReminderLog.objects.create(
+            schedule=schedule,
+            reminder_type="email",
+            status="sent"
+        )
+
+        return Response({
+            "message": "Reminder sent"
+        })
+class ReminderLogsAPIView(APIView):
+
+    def get(self, request):
+
+        logs = ReminderLog.objects.all()
+
+        data = []
+
+        for log in logs:
+
+            data.append({
+
+                "candidate":
+                log.schedule.candidate.email,
+
+                "type":
+                log.reminder_type,
+
+                "status":
+                log.status,
+
+                "sent_at":
+                log.sent_at
+            })
+
+        return Response(data)
