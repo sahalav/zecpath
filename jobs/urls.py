@@ -22,7 +22,7 @@ UserGrowthAPI,
 JobActivityAPI,
 ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
 EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView,
-ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView
+ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView
 )
 
 urlpatterns = [
@@ -144,5 +144,10 @@ path(
 path(
     'reminder-logs/',
     ReminderLogsAPIView.as_view()
-)
+),
+path(
+    'candidate-report/<int:candidate_id>/',
+    CandidateReportAPIView.as_view()
+),
+
 ]

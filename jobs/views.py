@@ -1160,3 +1160,82 @@ class ReminderLogsAPIView(APIView):
             })
 
         return Response(data)
+class CandidateReportAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, candidate_id):
+
+        # Recruiter / Employer only
+        if request.user.role != "employer":
+            return Response(
+                {"error": "Recruiters only"},
+                status=403
+            )
+
+        ats = ATSScore.objects.filter(
+            candidate_id=candidate_id
+        ).first()
+
+        answers = EvaluationResult.objects.filter(
+            answer__candidate_id=candidate_id
+        )
+
+        avg_score = 0
+
+        if answers.exists():
+
+            total_score = sum(
+                item.score
+                for item in answers
+            )
+
+            avg_score = (
+                total_score /
+                answers.count()
+            )
+
+        strengths = []
+        risks = []
+
+        if ats and ats.score >= 70:
+            strengths.append(
+                "Strong ATS Match"
+            )
+
+        if avg_score >= 70:
+            strengths.append(
+                "Good Interview Performance"
+            )
+
+        if avg_score < 50:
+            risks.append(
+                "Low Interview Score"
+            )
+
+        summary = (
+            f"Candidate scored "
+            f"{ats.score if ats else 0}% in ATS screening "
+            f"and {round(avg_score,2)}% in interview evaluation."
+        )
+
+        return Response({
+
+            "candidate_id": candidate_id,
+
+            "ats_score":
+            ats.score if ats else 0,
+
+            "interview_score":
+            round(avg_score, 2),
+
+            "strengths":
+            strengths,
+
+            "risks":
+            risks,
+
+            "summary":
+            summary
+        })
