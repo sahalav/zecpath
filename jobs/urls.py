@@ -22,7 +22,7 @@ UserGrowthAPI,
 JobActivityAPI,
 ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
 EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView,
-ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView
+ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView,JobPerformanceAPIView,AnalyticsAPIView,FunnelMetricsAPIView
 )
 
 urlpatterns = [
@@ -148,6 +148,20 @@ path(
 path(
     'candidate-report/<int:candidate_id>/',
     CandidateReportAPIView.as_view()
+),
+path(
+    'funnel-metrics/',
+    FunnelMetricsAPIView.as_view()
+),
+
+path(
+    'analytics/',
+    AnalyticsAPIView.as_view()
+),
+
+path(
+    'job-performance/',
+    JobPerformanceAPIView.as_view()
 ),
 
 ]

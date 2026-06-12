@@ -15,7 +15,7 @@ from .models import (
     Application,
     SavedJob,
     AuditLog,AICall, InterviewAnswer,EvaluationResult,AvailabilitySlot,
-    InterviewSchedule,ReminderLog
+    InterviewSchedule,ReminderLog,
 )
 
 from .serializers import (
@@ -1239,3 +1239,75 @@ class CandidateReportAPIView(APIView):
             "summary":
             summary
         })
+class FunnelMetricsAPIView(APIView):
+
+    def get(self, request):
+
+        applied = Application.objects.count()
+
+        shortlisted = Application.objects.filter(
+            status="shortlisted"
+        ).count()
+
+        interviewed = InterviewSchedule.objects.count()
+
+        selected = Application.objects.filter(
+            status="selected"
+        ).count()
+
+        return Response({
+
+            "applied": applied,
+
+            "shortlisted": shortlisted,
+
+            "interviewed": interviewed,
+
+            "selected": selected
+        })
+class AnalyticsAPIView(APIView):
+
+    def get(self, request):
+
+        return Response({
+
+            "total_jobs":
+            Job.objects.count(),
+
+            "total_applications":
+            Application.objects.count(),
+
+            "total_shortlisted":
+            Application.objects.filter(
+                status="shortlisted"
+            ).count(),
+
+            "total_interviews":
+            InterviewSchedule.objects.count(),
+
+            "total_selected":
+            Application.objects.filter(
+                status="selected"
+            ).count()
+        })
+class JobPerformanceAPIView(APIView):
+
+    def get(self, request):
+
+        jobs = Job.objects.all()
+
+        data = []
+
+        for job in jobs:
+
+            data.append({
+
+                "job": job.title,
+
+                "applications":
+                Application.objects.filter(
+                    job=job
+                ).count()
+            })
+
+        return Response(data)
