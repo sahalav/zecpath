@@ -1,3 +1,6 @@
+import logging
+
+logger = logging.getLogger(__name__)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -191,24 +194,18 @@ class JobDeleteAPI(APIView):
 
 # ✅ 6. Apply Job API
 class ApplyJobAPI(APIView):
-
-    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, job_id):
 
-        if request.user.role != "candidate":
-            return Response({
-                "error": "Only candidates can apply"
-            }, status=403)
-
         try:
             job = Job.objects.get(id=job_id)
-
         except Job.DoesNotExist:
-            return Response({
-                "error": "Job not found"
-            }, status=404)
+            logger.error(f"Job {job_id} not found")
+            return Response(
+                {"error": "Job not found"},
+                status=404
+            )
 
         already_applied = Application.objects.filter(
             candidate=request.user,
@@ -216,14 +213,30 @@ class ApplyJobAPI(APIView):
         ).exists()
 
         if already_applied:
-            return Response({
-                "error": "Already applied"
-            }, status=400)
+            logger.warning(
+                f"{request.user.email} tried to reapply for {job.title}"
+            )
+
+            return Response(
+                {"error": "Already applied"},
+                status=400
+            )
 
         application = Application.objects.create(
             candidate=request.user,
             job=job
         )
+
+        logger.info(
+            f"{request.user.email} applied for job {job.title}"
+        )
+
+        return Response({
+            "message": "Applied Successfully"
+        })
+
+        
+    
 
         # Email Notification
         send_mail(
