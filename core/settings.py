@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'accounts',
     'django_filters',
-    'jobs'
+    'jobs',
+    'subscriptions',
 ]
 
 MIDDLEWARE = [
