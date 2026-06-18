@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     'jobs',
     'subscriptions',
+    'payments'
 ]
 
 MIDDLEWARE = [
@@ -175,3 +176,6 @@ LOGGING = {
         "level": "INFO",
     },
 }
+RAZORPAY_KEY_ID ="rzp_test_T35Vfnet9YogKI"
+
+RAZORPAY_KEY_SECRET ="xndd53VHK3lQuitfLZlvwN65"
