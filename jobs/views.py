@@ -8,10 +8,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.core.mail import send_mail
 from .models import NotificationLog
-
+from .models import Subscription
+from .permissions import PremiumAccessPermission
+from rest_framework.decorators import permission_classes
 from accounts.models import User
 from accounts.models import Resume
 from .models import ATSScore, Job
+from rest_framework.decorators import api_view
 
 from .models import (
     Job,
@@ -93,20 +96,55 @@ class JobCreateAPI(APIView):
                 "error": "Employer not approved yet"
             }, status=403)
 
+        # Subscription Check
+        subscription = Subscription.objects.filter(
+            user=request.user,
+            is_active=True
+        ).first()
+
+        job_count = Job.objects.filter(
+            employer=request.user
+        ).count()
+
+        # FREE PLAN → Maximum 2 jobs
+        if not subscription:
+
+            if job_count >= 2:
+
+                return Response({
+                    "error":
+                    "Free plan job posting limit reached. Upgrade to Premium."
+                }, status=403)
+
+        # PREMIUM PLAN → Maximum 50 jobs
+        elif subscription.plan_name == "PREMIUM":
+
+            if job_count >= 50:
+
+                return Response({
+                    "error":
+                    "Premium plan limit reached."
+                }, status=403)
+
+        # ENTERPRISE → Unlimited Jobs
+
         serializer = JobSerializer(data=request.data)
 
         if serializer.is_valid():
 
-            serializer.save(employer=request.user)
+            serializer.save(
+                employer=request.user
+            )
 
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
 
-        return Response(serializer.errors, status=400)
-
-
+        return Response(
+            serializer.errors,
+            status=400
+        )
 # ✅ 3. Test API
 class TestAPI(APIView):
 
@@ -1324,3 +1362,37 @@ class JobPerformanceAPIView(APIView):
             })
 
         return Response(data)
+class SubscriptionStatusAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        subscription = Subscription.objects.filter(
+            user=request.user,
+            is_active=True
+        ).first()
+
+        if not subscription:
+            return Response({
+                "status": "inactive"
+            })
+
+        return Response({
+            "plan": subscription.plan_name,
+            "status": "active",
+            "expiry": subscription.end_date
+        })
+class PremiumReportAPIView(APIView):
+
+    permission_classes = [
+        IsAuthenticated,
+        PremiumAccessPermission
+    ]
+
+    def get(self, request):
+
+        return Response({
+            "message":
+            "Premium AI Report Access Granted"
+        })

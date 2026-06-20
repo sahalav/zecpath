@@ -22,7 +22,8 @@ UserGrowthAPI,
 JobActivityAPI,
 ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
 EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView,
-ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView,JobPerformanceAPIView,AnalyticsAPIView,FunnelMetricsAPIView
+ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView,JobPerformanceAPIView,AnalyticsAPIView,FunnelMetricsAPIView,SubscriptionStatusAPIView,
+PremiumReportAPIView,
 )
 
 urlpatterns = [
@@ -78,10 +79,7 @@ urlpatterns = [
         'platform-stats/',
         PlatformStatsAPI.as_view()
     ),
-    path(
-    'platform-stats/',
-    PlatformStatsAPI.as_view()
-),
+    
 
 path(
     'user-growth/',
@@ -162,6 +160,14 @@ path(
 path(
     'job-performance/',
     JobPerformanceAPIView.as_view()
+),
+path(
+    "subscription-status/",
+    SubscriptionStatusAPIView.as_view()
+),
+path(
+    "premium-report/",
+    PremiumReportAPIView.as_view()
 ),
 
 ]
