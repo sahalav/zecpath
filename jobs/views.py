@@ -1,4 +1,6 @@
+from .services import has_feature
 import logging
+
 
 logger = logging.getLogger(__name__)
 from rest_framework.views import APIView
@@ -15,6 +17,8 @@ from accounts.models import User
 from accounts.models import Resume
 from .models import ATSScore, Job
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .permissions import PremiumRecruiterPermission
 
 from .models import (
     Job,
@@ -1395,4 +1399,194 @@ class PremiumReportAPIView(APIView):
         return Response({
             "message":
             "Premium AI Report Access Granted"
+        })
+class PremiumCandidateRankingAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+
+    permission_classes = [
+        IsAuthenticated,
+        PremiumRecruiterPermission
+    ]
+
+    def get(self, request):
+
+        subscription = Subscription.objects.filter(
+            user=request.user,
+            is_active=True
+        ).first()
+
+        if not subscription:
+
+            return Response(
+                {
+                    "error":
+                    "Subscription required"
+                },
+                status=403
+            )
+
+        if not has_feature(
+            subscription,
+            "ai_ranking"
+        ):
+
+            return Response(
+                {
+                    "error":
+                    "Upgrade to Premium"
+                },
+                status=403
+            )
+
+        data = [
+
+            {
+                "candidate": "John",
+
+                "ats_score": 92,
+
+                "ai_score": 88,
+
+                "rank": 1
+            },
+
+            {
+                "candidate": "Sarah",
+
+                "ats_score": 85,
+
+                "ai_score": 80,
+
+                "rank": 2
+            }
+
+        ]
+
+        return Response({
+            "plan": subscription.plan_name,
+            "ranking": data
+        })
+class CandidatePredictionAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+
+    permission_classes = [
+        IsAuthenticated,
+        PremiumRecruiterPermission
+    ]
+
+    def get(self, request):
+
+        subscription = Subscription.objects.filter(
+            user=request.user,
+            is_active=True
+        ).first()
+
+        if not subscription:
+
+            return Response(
+                {
+                    "error":
+                    "Subscription required"
+                },
+                status=403
+            )
+
+        if not has_feature(
+            subscription,
+            "prediction"
+        ):
+
+            return Response(
+                {
+                    "error":
+                    "Enterprise Plan Required"
+                },
+                status=403
+            )
+
+        ats_score = 90
+
+        ai_score = 80
+
+        prediction_score = (
+            ats_score + ai_score
+        ) / 2
+
+        return Response({
+
+            "plan":
+            subscription.plan_name,
+
+            "candidate":
+            "John",
+
+            "prediction_score":
+            prediction_score,
+
+            "prediction":
+            "High Success"
+        })
+class HiringEfficiencyAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+
+    permission_classes = [
+        IsAuthenticated,
+        PremiumAccessPermission
+    ]
+
+    def get(self, request):
+
+        subscription = Subscription.objects.filter(
+            user=request.user,
+            is_active=True
+        ).first()
+
+        if not subscription:
+
+            return Response(
+                {
+                    "error":
+                    "Subscription required"
+                },
+                status=403
+            )
+
+        if not has_feature(
+            subscription,
+            "analytics"
+        ):
+
+            return Response(
+                {
+                    "error":
+                    "Upgrade to Premium"
+                },
+                status=403
+            )
+
+        total_applications = 100
+
+        total_selected = 20
+
+        efficiency = (
+            total_selected /
+            total_applications
+        ) * 100
+
+        return Response({
+
+            "plan":
+            subscription.plan_name,
+
+            "applications":
+            total_applications,
+
+            "selected":
+            total_selected,
+
+            "efficiency":
+            f"{efficiency}%"
         })

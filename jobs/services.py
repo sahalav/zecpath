@@ -51,3 +51,29 @@ class VoiceCallService:
             "status":
             "call_initiated"
         }
+def has_feature(subscription, feature):
+
+    plans = {
+
+        "FREE": [
+            "job_post"
+        ],
+
+        "PREMIUM": [
+            "job_post",
+            "analytics",
+            "ai_ranking"
+        ],
+
+        "ENTERPRISE": [
+            "job_post",
+            "analytics",
+            "ai_ranking",
+            "prediction"
+        ]
+    }
+
+    return feature in plans.get(
+        subscription.plan_name,
+        []
+    )

@@ -23,7 +23,7 @@ JobActivityAPI,
 ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
 EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView,
 ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView,JobPerformanceAPIView,AnalyticsAPIView,FunnelMetricsAPIView,SubscriptionStatusAPIView,
-PremiumReportAPIView,
+PremiumReportAPIView,PremiumCandidateRankingAPIView,CandidatePredictionAPIView,HiringEfficiencyAPIView
 )
 
 urlpatterns = [
@@ -169,5 +169,18 @@ path(
     "premium-report/",
     PremiumReportAPIView.as_view()
 ),
+path(
+    "premium-candidate-ranking/",
+    PremiumCandidateRankingAPIView.as_view()
+),
+path(
+    "candidate-prediction/",
+    CandidatePredictionAPIView.as_view()
+),
+path(
+    "hiring-efficiency/",
+    HiringEfficiencyAPIView.as_view()
+),
+
 
 ]
