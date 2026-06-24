@@ -447,3 +447,74 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.plan_name}"
+class PaymentTransaction(models.Model):
+
+    STATUS_CHOICES = (
+        ("SUCCESS", "Success"),
+        ("FAILED", "Failed"),
+        ("REFUNDED", "Refunded")
+    )
+
+    user =models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    related_name="job_transactions"
+)
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    transaction_id = models.CharField(
+        max_length=255,
+        unique=True
+    )
+
+    payment_gateway = models.CharField(
+        max_length=50,
+        default="Razorpay"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.transaction_id
+class RefundLog(models.Model):
+
+    transaction = models.ForeignKey(
+        PaymentTransaction,
+        on_delete=models.CASCADE
+    )
+
+    refund_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    reason = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+class FinancialAuditLog(models.Model):
+
+    event = models.CharField(
+        max_length=255
+    )
+
+    details = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.event

@@ -19,13 +19,19 @@ from .models import ATSScore, Job
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .permissions import PremiumRecruiterPermission
+from django.db.models import Sum
+from datetime import date
+from datetime import datetime
+from .models import PaymentTransaction
+from subscriptions.models import BillingHistory
+
 
 from .models import (
     Job,
     Application,
     SavedJob,
     AuditLog,AICall, InterviewAnswer,EvaluationResult,AvailabilitySlot,
-    InterviewSchedule,ReminderLog,
+    InterviewSchedule,ReminderLog,FinancialAuditLog
 )
 
 from .serializers import (
@@ -1590,3 +1596,178 @@ class HiringEfficiencyAPIView(APIView):
             "efficiency":
             f"{efficiency}%"
         })
+class TransactionListAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        if request.user.role != "admin":
+            return Response(
+                {"error": "Admin Only"},
+                status=403
+            )
+
+        transactions = PaymentTransaction.objects.all()
+
+        data = []
+
+        for t in transactions:
+
+            data.append({
+                "user": t.user.email,
+                "amount": t.amount,
+                "transaction_id": t.transaction_id,
+                "status": t.status
+            })
+
+        return Response(data)
+class DailyRevenueAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        revenue = PaymentTransaction.objects.filter(
+            status="SUCCESS",
+            created_at__date=date.today()
+        ).aggregate(
+            total=Sum("amount")
+        )
+
+        return Response({
+            "daily_revenue":
+            revenue["total"] or 0
+        })
+class MonthlyRevenueAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        revenue = PaymentTransaction.objects.filter(
+            status="SUCCESS",
+            created_at__month=datetime.now().month
+        ).aggregate(
+            total=Sum("amount")
+        )
+
+        return Response({
+            "monthly_revenue":
+            revenue["total"] or 0
+        })
+class PlanRevenueAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        return Response({
+
+            "FREE": 0,
+
+            "PREMIUM": 15000,
+
+            "ENTERPRISE": 50000
+
+        })
+class RefundAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, transaction_id):
+
+        transaction = PaymentTransaction.objects.get(
+            id=transaction_id
+        )
+
+        transaction.status = "REFUNDED"
+        transaction.save()
+
+        RefundLog.objects.create(
+            transaction=transaction,
+            refund_amount=transaction.amount,
+            reason="Admin Refund"
+        )
+
+        return Response({
+            "message":
+            "Refund Successful"
+        })
+class FinancialAuditAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        logs = FinancialAuditLog.objects.all()
+
+        data = []
+
+        for log in logs:
+
+            data.append({
+                "event": log.event,
+                "details": log.details
+            })
+
+        return Response(data)
+class BillingHistoryAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        history = BillingHistory.objects.all()
+
+        data = []
+
+        for h in history:
+
+            data.append({
+
+                "user":
+                h.user.email,
+
+                "invoice":
+                h.invoice_number,
+
+                "generated_at":
+                h.generated_at
+            })
+
+        return Response(data)
+class SubscriptionHistoryAPIView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        subscriptions = Subscription.objects.all()
+
+        data = []
+
+        for s in subscriptions:
+
+            data.append({
+
+                "user":
+                s.user.email,
+
+                "plan":
+                s.plan_name,
+
+                "active":
+                s.is_active
+            })
+
+        return Response(data)
+    

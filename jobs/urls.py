@@ -23,7 +23,7 @@ JobActivityAPI,
 ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
 EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView,
 ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView,JobPerformanceAPIView,AnalyticsAPIView,FunnelMetricsAPIView,SubscriptionStatusAPIView,
-PremiumReportAPIView,PremiumCandidateRankingAPIView,CandidatePredictionAPIView,HiringEfficiencyAPIView
+PremiumReportAPIView,PremiumCandidateRankingAPIView,CandidatePredictionAPIView,HiringEfficiencyAPIView,PlanRevenueAPIView,MonthlyRevenueAPIView,DailyRevenueAPIView,TransactionListAPIView,RefundAPIView,FinancialAuditAPIView,BillingHistoryAPIView,SubscriptionHistoryAPIView,SubscriptionHistoryAPIView
 )
 
 urlpatterns = [
@@ -181,6 +181,37 @@ path(
     "hiring-efficiency/",
     HiringEfficiencyAPIView.as_view()
 ),
-
+path(
+    "transactions/",
+    TransactionListAPIView.as_view()
+),
+path(
+    "daily-revenue/",
+    DailyRevenueAPIView.as_view()
+),
+path(
+    "monthly-revenue/",
+    MonthlyRevenueAPIView.as_view()
+),
+path(
+    "plan-revenue/",
+    PlanRevenueAPIView.as_view()
+),
+path(
+    "refund/<int:transaction_id>/",
+    RefundAPIView.as_view()
+),
+path(
+    "financial-audit/",
+    FinancialAuditAPIView.as_view()
+),
+path(
+    "billing-history/",
+    BillingHistoryAPIView.as_view()
+),
+path(
+    "subscription-history/",
+    SubscriptionHistoryAPIView.as_view()
+),
 
 ]

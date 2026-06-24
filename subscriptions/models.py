@@ -19,7 +19,11 @@ class UserSubscription(models.Model):
 
 
 class PaymentTransaction(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = user = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    related_name="subscription_transactions"
+)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_id = models.CharField(max_length=100)
     status = models.CharField(max_length=20)
