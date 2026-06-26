@@ -1,10 +1,10 @@
-<<<<<<< HEAD
+ HEAD
 venv/
 .env
 __pycache__/
 db.sqlite3
 *.pyc
-=======
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -212,4 +212,4 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
->>>>>>> f74ded4b4456e21690d0199df527164b57db9641
+ f74ded4b4456e21690d0199df527164b57db9641
