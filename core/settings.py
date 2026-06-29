@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'payments'
 ]
 
-MIDDLEWARE = [
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
