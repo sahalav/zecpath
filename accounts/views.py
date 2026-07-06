@@ -244,6 +244,51 @@ def upload_resume(request):
         "message": "Resume uploaded successfully",
         "file": profile.resume.url
     })
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def download_resume(request):
+
+    try:
+        resume = Resume.objects.filter(user=request.user).last()
+        if not resume:
+            return Response(
+                {"error": "No resume uploaded"},
+                status=404
+            )
+
+        return Response({
+            "resume_url": resume.file.url
+        })
+
+    except CandidateProfile.DoesNotExist:
+        return Response(
+            {"error": "Candidate profile not found"},
+            status=404
+        )
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_resume(request):
+
+    try:
+        resume = Resume.objects.filter(
+            user=request.user
+        ).latest("uploaded_at")
+
+    except Resume.DoesNotExist:
+        return Response(
+            {"error": "No resume found"},
+            status=404
+        )
+
+    # Delete file from S3
+    resume.file.delete(save=False)
+
+    # Delete database record
+    resume.delete()
+
+    return Response({
+        "message": "Resume deleted successfully"
+    })
 
 
 # -------------------------

@@ -11,6 +11,8 @@ from .views import (
     update_candidate_profile,
     delete_candidate_profile,
     upload_resume,
+    download_resume,
+    delete_resume,
     UserListView, ApproveEmployerAPI,
     FlaggedUsersAPI,FlagUserAPI,ResumeParserAPI
     
@@ -34,6 +36,11 @@ path('candidate-profile/view/', view_candidate_profile),
 path('candidate-profile/update/', update_candidate_profile),
 path('candidate-profile/delete/', delete_candidate_profile),
 path('resume/upload/', upload_resume),
+path('resume/download/', download_resume),
+path(
+    "resume/delete/",
+    delete_resume
+),
 path('users/', UserListView.as_view()),
 path(
     'approve-employer/<int:user_id>/',
