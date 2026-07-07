@@ -1,5 +1,6 @@
 from .services import has_feature
 import logging
+from django.core.cache import cache
 
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,15 @@ class JobListAPI(APIView):
 
     def get(self, request):
 
+        # Unique cache key based on filters
+        cache_key = f"jobs_{request.GET.urlencode()}"
+
+        # Check cache first
+        cached_jobs = cache.get(cache_key)
+
+        if cached_jobs:
+            return Response(cached_jobs)
+
         jobs = Job.objects.filter(is_active=True)
 
         featured = request.GET.get('featured')
@@ -83,7 +93,17 @@ class JobListAPI(APIView):
         if job_type:
             jobs = jobs.filter(job_type=job_type)
 
+        # ORM Optimization
+        jobs = jobs.select_related("employer")
+
         serializer = JobSerializer(jobs, many=True)
+
+        # Store data in cache for 5 minutes
+        cache.set(
+            cache_key,
+            serializer.data,
+            timeout=300
+        )
 
         return Response(serializer.data)
 

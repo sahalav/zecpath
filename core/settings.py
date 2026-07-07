@@ -102,7 +102,8 @@ DATABASES = {
         default=os.environ.get(
             "DATABASE_URL",
             f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-        )
+        ),
+        conn_max_age=600,
     )
 }
 
@@ -220,3 +221,9 @@ AWS_QUERYSTRING_AUTH = False
 
 print("ENV EXISTS:", (BASE_DIR / ".env").exists())
 print("BUCKET:", os.getenv("AWS_STORAGE_BUCKET_NAME"))
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "zecpath-cache",
+    }
+}

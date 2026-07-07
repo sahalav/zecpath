@@ -47,6 +47,14 @@ class Job(models.Model):
 
     def __str__(self):
         return self.title
+class Meta:
+    indexes = [
+        models.Index(fields=["salary"]),
+        models.Index(fields=["experience"]),
+        models.Index(fields=["created_at"]),
+        models.Index(fields=["is_active"]),
+        models.Index(fields=["is_featured"]),
+    ]
 
 
 class Application(models.Model):
