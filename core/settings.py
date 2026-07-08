@@ -56,7 +56,9 @@ INSTALLED_APPS = [
     'jobs',
     'subscriptions',
     'payments',
-    'storages'
+    'storages',
+    'rest_framework_simplejwt.token_blacklist',
+     'drf_yasg',
 ]
 
 
@@ -183,10 +185,14 @@ REST_FRAMEWORK = {
     },
 }
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-}
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+
+    "UPDATE_LAST_LOGIN": True,
+}
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGGING = {
     "version": 1,
