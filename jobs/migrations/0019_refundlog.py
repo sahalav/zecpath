@@ -14,11 +14,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='RefundLog',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('refund_amount', models.DecimalField(decimal_places=2, max_digits=10)),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('refund_amount', models.DecimalField(
+                    decimal_places=2, max_digits=10)),
                 ('reason', models.TextField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('transaction', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.paymenttransaction')),
+                ('transaction', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.paymenttransaction')),
             ],
         ),
     ]

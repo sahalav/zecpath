@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Job',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=255)),
                 ('description', models.TextField()),
                 ('company', models.CharField(max_length=255)),
@@ -22,7 +23,8 @@ class Migration(migrations.Migration):
                 ('location', models.CharField(max_length=255)),
                 ('salary', models.IntegerField()),
                 ('experience', models.IntegerField()),
-                ('job_type', models.CharField(choices=[('full_time', 'Full Time'), ('part_time', 'Part Time'), ('internship', 'Internship')], max_length=20)),
+                ('job_type', models.CharField(choices=[('full_time', 'Full Time'), (
+                    'part_time', 'Part Time'), ('internship', 'Internship')], max_length=20)),
                 ('is_active', models.BooleanField(default=True)),
                 ('is_featured', models.BooleanField(default=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='candidateprofile',
             name='resume',
-            field=models.FileField(blank=True, null=True, upload_to='resumes/'),
+            field=models.FileField(blank=True, null=True,
+                                   upload_to='resumes/'),
         ),
     ]

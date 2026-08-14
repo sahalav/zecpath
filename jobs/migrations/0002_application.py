@@ -16,11 +16,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Application',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('shortlisted', 'Shortlisted'), ('rejected', 'Rejected')], default='pending', max_length=20)),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('status', models.CharField(choices=[('pending', 'Pending'), ('shortlisted', 'Shortlisted'), (
+                    'rejected', 'Rejected')], default='pending', max_length=20)),
                 ('applied_date', models.DateTimeField(auto_now_add=True)),
-                ('candidate', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.job')),
+                ('candidate', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('job', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.job')),
             ],
         ),
     ]

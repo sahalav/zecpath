@@ -16,13 +16,16 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Subscription',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('plan_name', models.CharField(choices=[('FREE', 'Free'), ('PREMIUM', 'Premium'), ('ENTERPRISE', 'Enterprise')], max_length=20)),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('plan_name', models.CharField(choices=[
+                 ('FREE', 'Free'), ('PREMIUM', 'Premium'), ('ENTERPRISE', 'Enterprise')], max_length=20)),
                 ('start_date', models.DateField()),
                 ('end_date', models.DateField()),
                 ('is_active', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

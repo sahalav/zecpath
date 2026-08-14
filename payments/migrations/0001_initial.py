@@ -14,9 +14,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Payment',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('order_id', models.CharField(max_length=200)),
-                ('payment_id', models.CharField(blank=True, max_length=200, null=True)),
+                ('payment_id', models.CharField(
+                    blank=True, max_length=200, null=True)),
                 ('amount', models.IntegerField()),
                 ('status', models.CharField(default='pending', max_length=50)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

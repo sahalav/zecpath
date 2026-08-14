@@ -14,25 +14,32 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='QuestionTemplate',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('question_text', models.TextField()),
-                ('category', models.CharField(choices=[('intro', 'Introduction'), ('experience', 'Experience'), ('skills', 'Skills'), ('availability', 'Availability'), ('salary', 'Salary')], max_length=50)),
+                ('category', models.CharField(choices=[('intro', 'Introduction'), ('experience', 'Experience'), (
+                    'skills', 'Skills'), ('availability', 'Availability'), ('salary', 'Salary')], max_length=50)),
             ],
         ),
         migrations.CreateModel(
             name='InterviewState',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('current_question_index', models.IntegerField(default=0)),
-                ('session', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.aiinterviewsession')),
+                ('session', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.aiinterviewsession')),
             ],
         ),
         migrations.CreateModel(
             name='JobQuestion',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.job')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.questiontemplate')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('job', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.job')),
+                ('question', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.questiontemplate')),
             ],
         ),
     ]

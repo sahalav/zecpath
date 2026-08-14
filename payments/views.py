@@ -14,6 +14,7 @@ client = razorpay.Client(
     )
 )
 
+
 class CreateOrderAPIView(APIView):
 
     def post(self, request):
@@ -27,6 +28,8 @@ class CreateOrderAPIView(APIView):
         })
 
         return Response(order)
+
+
 class VerifyPaymentAPIView(APIView):
 
     def post(self, request):
@@ -59,6 +62,8 @@ class VerifyPaymentAPIView(APIView):
             return Response({
                 "error": "Invalid Payment"
             }, status=400)
+
+
 class RazorpayWebhookAPIView(APIView):
 
     authentication_classes = []

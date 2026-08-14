@@ -23,6 +23,8 @@ class SignupSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+
 class CandidateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CandidateProfile
@@ -31,15 +33,16 @@ class CandidateProfileSerializer(serializers.ModelSerializer):
 
 
 class EmployerProfileSerializer(serializers.ModelSerializer):
- class Meta:
+    class Meta:
         model = EmployerProfile
         fields = '__all__'
         read_only_fields = ['user', 'is_deleted']
+
+
 class UserListSerializer(serializers.ModelSerializer):
- class Meta:
+    class Meta:
         model = User
         fields = ['id', 'email', 'role', 'phone', 'is_verified']
-
 
 
 class ResumeSerializer(serializers.ModelSerializer):

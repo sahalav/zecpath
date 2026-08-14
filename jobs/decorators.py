@@ -4,6 +4,7 @@ from rest_framework import status
 from jobs.models import Subscription
 from datetime import date
 
+
 def subscription_required(view_func):
 
     @wraps(view_func)

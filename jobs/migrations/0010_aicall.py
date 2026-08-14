@@ -16,11 +16,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AICall',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('queued', 'Queued'), ('in_progress', 'In Progress'), ('completed', 'Completed'), ('failed', 'Failed')], default='queued', max_length=20)),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('status', models.CharField(choices=[('queued', 'Queued'), ('in_progress', 'In Progress'), (
+                    'completed', 'Completed'), ('failed', 'Failed')], default='queued', max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('candidate', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.job')),
+                ('candidate', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('job', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.job')),
             ],
         ),
     ]

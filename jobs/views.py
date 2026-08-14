@@ -1,45 +1,50 @@
+from .serializers import (
+    JobSerializer,
+    ApplicationSerializer,
+    SavedJobSerializer
+)
+from .models import (
+    Job,
+    Application,
+    SavedJob,
+    AuditLog, AICall, InterviewAnswer, EvaluationResult, AvailabilitySlot,
+    InterviewSchedule, ReminderLog, FinancialAuditLog
+)
+from .models import (
+    InterviewSchedule,
+    InterviewRescheduleRequest
+)
+from drf_yasg.utils import swagger_auto_schema
+
+from .serializers import (
+    InterviewRescheduleRequestSerializer
+)
+from subscriptions.models import BillingHistory
+from .models import PaymentTransaction
+from datetime import datetime
+from datetime import date
+from django.db.models import Sum
+from .permissions import PremiumRecruiterPermission
+from rest_framework.decorators import api_view
+from .models import ATSScore, Job
+from accounts.models import Resume
+from accounts.models import User
+from rest_framework.decorators import permission_classes
+from .permissions import PremiumAccessPermission
+from .models import Subscription
+from .models import NotificationLog
+from django.core.mail import send_mail
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from .services import has_feature
 import logging
 from django.core.cache import cache
 
 
 logger = logging.getLogger(__name__)
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.core.mail import send_mail
-from .models import NotificationLog
-from .models import Subscription
-from .permissions import PremiumAccessPermission
-from rest_framework.decorators import permission_classes
-from accounts.models import User
-from accounts.models import Resume
-from .models import ATSScore, Job
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .permissions import PremiumRecruiterPermission
-from django.db.models import Sum
-from datetime import date
-from datetime import datetime
-from .models import PaymentTransaction
-from subscriptions.models import BillingHistory
-
-
-from .models import (
-    Job,
-    Application,
-    SavedJob,
-    AuditLog,AICall, InterviewAnswer,EvaluationResult,AvailabilitySlot,
-    InterviewSchedule,ReminderLog,FinancialAuditLog
-)
-
-from .serializers import (
-    JobSerializer,
-    ApplicationSerializer,
-    SavedJobSerializer
-)
 
 
 # ✅ 1. Job List API
@@ -176,6 +181,8 @@ class JobCreateAPI(APIView):
             status=400
         )
 # ✅ 3. Test API
+
+
 class TestAPI(APIView):
 
     def get(self, request):
@@ -303,9 +310,6 @@ class ApplyJobAPI(APIView):
             "message": "Applied Successfully"
         })
 
-        
-    
-
         # Email Notification
         send_mail(
             subject='Job Application Submitted',
@@ -330,6 +334,8 @@ class ApplyJobAPI(APIView):
             status=201
         )
 # ✅ 7. ATS Status Update API
+
+
 class UpdateApplicationStatusAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -420,9 +426,9 @@ class ApplicantsAPI(APIView):
             }, status=403)
 
         applications = Application.objects.select_related(
-    'candidate',
-    'job'
-)
+            'candidate',
+            'job'
+        )
 
         status_filter = request.GET.get('status')
 
@@ -460,11 +466,10 @@ class AppliedJobsAPI(APIView):
             }, status=403)
 
         applications = Application.objects.select_related(
-    'job'
-).filter(
-    candidate=request.user
-)
-        
+            'job'
+        ).filter(
+            candidate=request.user
+        )
 
         serializer = ApplicationSerializer(
             applications,
@@ -652,12 +657,14 @@ class BlockUserAPI(APIView):
             admin=request.user,
             action='block_user',
             target_user=user,
-           description='User blocked by admin'
+            description='User blocked by admin'
         )
 
         return Response({
             "message": "User blocked"
         })
+
+
 class PlatformStatsAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -697,6 +704,8 @@ class PlatformStatsAPI(APIView):
 
             "total_candidates": total_candidates
         })
+
+
 class UserGrowthAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -730,6 +739,8 @@ class UserGrowthAPI(APIView):
             })
 
         return Response(data)
+
+
 class JobActivityAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -763,6 +774,7 @@ class JobActivityAPI(APIView):
             })
 
         return Response(data)
+
 
 class ATSMatchAPI(APIView):
 
@@ -858,7 +870,9 @@ class ATSMatchAPI(APIView):
             "match_percentage": score,
 
             "status": status_value
-        })        
+        })
+
+
 class RankedCandidatesAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -903,6 +917,8 @@ class RankedCandidatesAPI(APIView):
             rank += 1
 
         return Response(data)
+
+
 class EligibilityAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -934,6 +950,8 @@ class EligibilityAPI(APIView):
 
             "score": ats.score
         })
+
+
 class NotificationLogsAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -964,6 +982,8 @@ class NotificationLogsAPI(APIView):
             })
 
         return Response(data)
+
+
 class EligibilityCheckAPIView(APIView):
 
     def get(self, request, candidate_id):
@@ -989,6 +1009,8 @@ class EligibilityCheckAPIView(APIView):
             "eligible": False,
             "score": ats.score
         })
+
+
 class TriggerAICallAPIView(APIView):
 
     def post(self, request, candidate_id):
@@ -1020,6 +1042,8 @@ class TriggerAICallAPIView(APIView):
             "job": call.job.title,
             "status": call.status
         })
+
+
 class CallStatusAPIView(APIView):
 
     def get(self, request):
@@ -1037,6 +1061,8 @@ class CallStatusAPIView(APIView):
             })
 
         return Response(data)
+
+
 class SubmitAnswerAPIView(APIView):
 
     def post(self, request):
@@ -1062,6 +1088,8 @@ class SubmitAnswerAPIView(APIView):
             "id": obj.id
 
         })
+
+
 class EvaluateAnswerAPIView(APIView):
 
     def post(self, request, answer_id):
@@ -1108,6 +1136,7 @@ class EvaluateAnswerAPIView(APIView):
 
         })
 
+
 class EvaluationResultsAPIView(APIView):
 
     def get(self, request):
@@ -1132,6 +1161,8 @@ class EvaluationResultsAPIView(APIView):
             })
 
         return Response(data)
+
+
 class ScheduleInterviewAPIView(APIView):
 
     def post(self, request, candidate_id):
@@ -1182,6 +1213,250 @@ class ScheduleInterviewAPIView(APIView):
             "time": schedule.interview_time,
             "status": schedule.status
         })
+class InterviewRescheduleRequestView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=InterviewRescheduleRequestSerializer
+    )
+    def post(self, request, interview_id):
+
+    
+        try:
+            interview = InterviewSchedule.objects.get(
+                id=interview_id
+            )
+
+        except InterviewSchedule.DoesNotExist:
+
+            return Response(
+                {
+                    "detail": "Interview not found."
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Only candidate or employer involved
+        if request.user != interview.candidate and \
+           request.user != interview.job.employer:
+
+            return Response(
+                {
+                    "detail": "You are not allowed to reschedule this interview."
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Only scheduled interviews
+        if interview.status != "scheduled":
+
+            return Response(
+                {
+                    "detail": "Only scheduled interviews can be rescheduled."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Prevent duplicate pending request
+        existing_request = (
+            InterviewRescheduleRequest.objects.filter(
+                interview=interview,
+                status="pending"
+            ).first()
+        )
+
+        if existing_request:
+
+            return Response(
+                {
+                    "detail": "A reschedule request is already pending."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = InterviewRescheduleRequestSerializer(
+            data=request.data,
+            context={
+                "request": request,
+                "interview": interview
+            }
+        )
+
+        if serializer.is_valid():
+
+            reschedule_request = serializer.save(
+                interview=interview,
+                requested_by=request.user,
+                old_date=interview.interview_date,
+                old_time=interview.interview_time
+            )
+
+            return Response(
+                InterviewRescheduleRequestSerializer(
+                    reschedule_request
+                ).data,
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+class ApproveInterviewRescheduleView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, request_id):
+
+        try:
+            reschedule_request = (
+                InterviewRescheduleRequest.objects.select_related(
+                    "interview",
+                    "interview__job"
+                ).get(
+                    id=request_id
+                )
+            )
+
+        except InterviewRescheduleRequest.DoesNotExist:
+
+            return Response(
+                {
+                    "detail": "Reschedule request not found."
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        interview = reschedule_request.interview
+
+        # Only employer can approve
+        if request.user != interview.job.employer:
+
+            return Response(
+                {
+                    "detail": "Only the employer can approve this request."
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Already processed
+        if reschedule_request.status != "pending":
+
+            return Response(
+                {
+                    "detail": (
+                        f"Request is already "
+                        f"{reschedule_request.status}."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update interview schedule
+        interview.interview_date = (
+            reschedule_request.new_date
+        )
+
+        interview.interview_time = (
+            reschedule_request.new_time
+        )
+
+        interview.save(
+            update_fields=[
+                "interview_date",
+                "interview_time"
+            ]
+        )
+
+        # Update request
+        reschedule_request.status = "approved"
+
+        reschedule_request.save(
+            update_fields=[
+                "status",
+                "updated_at"
+            ]
+        )
+
+        return Response(
+            {
+                "message": "Interview reschedule approved.",
+                "interview_id": interview.id,
+                "new_date": interview.interview_date,
+                "new_time": interview.interview_time,
+                "status": reschedule_request.status
+            },
+            status=status.HTTP_200_OK
+        )
+class RejectInterviewRescheduleView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, request_id):
+
+        try:
+            reschedule_request = (
+                InterviewRescheduleRequest.objects.select_related(
+                    "interview",
+                    "interview__job"
+                ).get(
+                    id=request_id
+                )
+            )
+
+        except InterviewRescheduleRequest.DoesNotExist:
+
+            return Response(
+                {
+                    "detail": "Reschedule request not found."
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        interview = reschedule_request.interview
+
+        # Only employer can reject
+        if request.user != interview.job.employer:
+
+            return Response(
+                {
+                    "detail": "Only the employer can reject this request."
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if reschedule_request.status != "pending":
+
+            return Response(
+                {
+                    "detail": (
+                        f"Request is already "
+                        f"{reschedule_request.status}."
+                    )
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        reschedule_request.status = "rejected"
+
+        reschedule_request.save(
+            update_fields=[
+                "status",
+                "updated_at"
+            ]
+        )
+
+        return Response(
+            {
+                "message": "Interview reschedule rejected.",
+                "request_id": reschedule_request.id,
+                "status": reschedule_request.status
+            },
+            status=status.HTTP_200_OK
+        )
+
+
 class SendReminderAPIView(APIView):
 
     def post(self, request, schedule_id):
@@ -1193,8 +1468,7 @@ class SendReminderAPIView(APIView):
         send_mail(
             subject="Interview Reminder",
 
-            message=
-            f"Reminder: Interview on "
+            message=f"Reminder: Interview on "
             f"{schedule.interview_date}",
 
             from_email="admin@zecpath.com",
@@ -1215,6 +1489,8 @@ class SendReminderAPIView(APIView):
         return Response({
             "message": "Reminder sent"
         })
+
+
 class ReminderLogsAPIView(APIView):
 
     def get(self, request):
@@ -1241,6 +1517,8 @@ class ReminderLogsAPIView(APIView):
             })
 
         return Response(data)
+
+
 class CandidateReportAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1298,7 +1576,7 @@ class CandidateReportAPIView(APIView):
         summary = (
             f"Candidate scored "
             f"{ats.score if ats else 0}% in ATS screening "
-            f"and {round(avg_score,2)}% in interview evaluation."
+            f"and {round(avg_score, 2)}% in interview evaluation."
         )
 
         return Response({
@@ -1320,6 +1598,8 @@ class CandidateReportAPIView(APIView):
             "summary":
             summary
         })
+
+
 class FunnelMetricsAPIView(APIView):
 
     def get(self, request):
@@ -1346,6 +1626,8 @@ class FunnelMetricsAPIView(APIView):
 
             "selected": selected
         })
+
+
 class AnalyticsAPIView(APIView):
 
     def get(self, request):
@@ -1371,6 +1653,8 @@ class AnalyticsAPIView(APIView):
                 status="selected"
             ).count()
         })
+
+
 class JobPerformanceAPIView(APIView):
 
     def get(self, request):
@@ -1392,6 +1676,8 @@ class JobPerformanceAPIView(APIView):
             })
 
         return Response(data)
+
+
 class SubscriptionStatusAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
@@ -1413,6 +1699,8 @@ class SubscriptionStatusAPIView(APIView):
             "status": "active",
             "expiry": subscription.end_date
         })
+
+
 class PremiumReportAPIView(APIView):
 
     permission_classes = [
@@ -1426,6 +1714,8 @@ class PremiumReportAPIView(APIView):
             "message":
             "Premium AI Report Access Granted"
         })
+
+
 class PremiumCandidateRankingAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1493,6 +1783,8 @@ class PremiumCandidateRankingAPIView(APIView):
             "plan": subscription.plan_name,
             "ranking": data
         })
+
+
 class CandidatePredictionAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1554,6 +1846,8 @@ class CandidatePredictionAPIView(APIView):
             "prediction":
             "High Success"
         })
+
+
 class HiringEfficiencyAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1616,6 +1910,8 @@ class HiringEfficiencyAPIView(APIView):
             "efficiency":
             f"{efficiency}%"
         })
+
+
 class TransactionListAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1643,6 +1939,8 @@ class TransactionListAPIView(APIView):
             })
 
         return Response(data)
+
+
 class DailyRevenueAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1661,6 +1959,8 @@ class DailyRevenueAPIView(APIView):
             "daily_revenue":
             revenue["total"] or 0
         })
+
+
 class MonthlyRevenueAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1679,6 +1979,8 @@ class MonthlyRevenueAPIView(APIView):
             "monthly_revenue":
             revenue["total"] or 0
         })
+
+
 class PlanRevenueAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1695,6 +1997,8 @@ class PlanRevenueAPIView(APIView):
             "ENTERPRISE": 50000
 
         })
+
+
 class RefundAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1719,6 +2023,8 @@ class RefundAPIView(APIView):
             "message":
             "Refund Successful"
         })
+
+
 class FinancialAuditAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1738,6 +2044,8 @@ class FinancialAuditAPIView(APIView):
             })
 
         return Response(data)
+
+
 class BillingHistoryAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -1764,6 +2072,8 @@ class BillingHistoryAPIView(APIView):
             })
 
         return Response(data)
+
+
 class SubscriptionHistoryAPIView(APIView):
 
     authentication_classes = [JWTAuthentication]

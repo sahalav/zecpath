@@ -18,12 +18,19 @@ from .views import (
     BlockUserAPI,
     PlatformStatsAPI,
     PlatformStatsAPI,
-UserGrowthAPI,
-JobActivityAPI,
-ATSMatchAPI,RankedCandidatesAPI,EligibilityAPI,NotificationLogsAPI,
-EligibilityCheckAPIView,TriggerAICallAPIView,CallStatusAPIView,SubmitAnswerAPIView,EvaluateAnswerAPIView,EvaluationResultsAPIView,
-ScheduleInterviewAPIView,SendReminderAPIView,ReminderLogsAPIView,CandidateReportAPIView,JobPerformanceAPIView,AnalyticsAPIView,FunnelMetricsAPIView,SubscriptionStatusAPIView,
-PremiumReportAPIView,PremiumCandidateRankingAPIView,CandidatePredictionAPIView,HiringEfficiencyAPIView,PlanRevenueAPIView,MonthlyRevenueAPIView,DailyRevenueAPIView,TransactionListAPIView,RefundAPIView,FinancialAuditAPIView,BillingHistoryAPIView,SubscriptionHistoryAPIView,SubscriptionHistoryAPIView
+    UserGrowthAPI,
+    JobActivityAPI,
+    ATSMatchAPI, RankedCandidatesAPI, EligibilityAPI, NotificationLogsAPI,
+    EligibilityCheckAPIView, TriggerAICallAPIView, CallStatusAPIView, SubmitAnswerAPIView,
+      EvaluateAnswerAPIView, EvaluationResultsAPIView,
+    ScheduleInterviewAPIView, SendReminderAPIView, ReminderLogsAPIView, 
+    CandidateReportAPIView, JobPerformanceAPIView, AnalyticsAPIView, FunnelMetricsAPIView, SubscriptionStatusAPIView,
+    PremiumReportAPIView, PremiumCandidateRankingAPIView, CandidatePredictionAPIView, HiringEfficiencyAPIView, 
+    PlanRevenueAPIView,MonthlyRevenueAPIView, DailyRevenueAPIView, TransactionListAPIView,
+      RefundAPIView, FinancialAuditAPIView, BillingHistoryAPIView,
+    SubscriptionHistoryAPIView, SubscriptionHistoryAPIView,InterviewRescheduleRequestView,
+    ApproveInterviewRescheduleView,
+    RejectInterviewRescheduleView,
 )
 
 urlpatterns = [
@@ -79,139 +86,156 @@ urlpatterns = [
         'platform-stats/',
         PlatformStatsAPI.as_view()
     ),
-    
+
+
+    path(
+        'user-growth/',
+        UserGrowthAPI.as_view()
+    ),
+
+    path(
+        'job-activity/',
+        JobActivityAPI.as_view()
+    ),
+    path(
+        'ats-match/<int:job_id>/',
+        ATSMatchAPI.as_view()
+    ),
+    path(
+        'ranked-candidates/',
+        RankedCandidatesAPI.as_view()
+    ),
+    path(
+        'eligibility/<int:job_id>/',
+        EligibilityAPI.as_view()
+    ),
+    path(
+        'notification-logs/',
+        NotificationLogsAPI.as_view()
+    ),
+    path(
+        'check-eligibility/<int:candidate_id>/',
+        EligibilityCheckAPIView.as_view()
+    ),
+    path(
+        'trigger-ai-call/<int:candidate_id>/',
+        TriggerAICallAPIView.as_view()
+    ),
+
+    path(
+        'call-status/',
+        CallStatusAPIView.as_view()
+    ),
+    path(
+        'submit-answer/',
+        SubmitAnswerAPIView.as_view()
+    ),
+    path(
+        'evaluate-answer/<int:answer_id>/',
+        EvaluateAnswerAPIView.as_view()
+    ),
+    path(
+        'evaluation-results/',
+        EvaluationResultsAPIView.as_view()
+    ),
+    path(
+        'schedule-interview/<int:candidate_id>/',
+        ScheduleInterviewAPIView.as_view()
+    ),
+    path(
+        'send-reminder/<int:schedule_id>/',
+        SendReminderAPIView.as_view()
+    ),
+    path(
+        'reminder-logs/',
+        ReminderLogsAPIView.as_view()
+    ),
+    path(
+        'candidate-report/<int:candidate_id>/',
+        CandidateReportAPIView.as_view()
+    ),
+    path(
+        'funnel-metrics/',
+        FunnelMetricsAPIView.as_view()
+    ),
+
+    path(
+        'analytics/',
+        AnalyticsAPIView.as_view()
+    ),
+
+    path(
+        'job-performance/',
+        JobPerformanceAPIView.as_view()
+    ),
+    path(
+        "subscription-status/",
+        SubscriptionStatusAPIView.as_view()
+    ),
+    path(
+        "premium-report/",
+        PremiumReportAPIView.as_view()
+    ),
+    path(
+        "premium-candidate-ranking/",
+        PremiumCandidateRankingAPIView.as_view()
+    ),
+    path(
+        "candidate-prediction/",
+        CandidatePredictionAPIView.as_view()
+    ),
+    path(
+        "hiring-efficiency/",
+        HiringEfficiencyAPIView.as_view()
+    ),
+    path(
+        "transactions/",
+        TransactionListAPIView.as_view()
+    ),
+    path(
+        "daily-revenue/",
+        DailyRevenueAPIView.as_view()
+    ),
+    path(
+        "monthly-revenue/",
+        MonthlyRevenueAPIView.as_view()
+    ),
+    path(
+        "plan-revenue/",
+        PlanRevenueAPIView.as_view()
+    ),
+    path(
+        "refund/<int:transaction_id>/",
+        RefundAPIView.as_view()
+    ),
+    path(
+        "financial-audit/",
+        FinancialAuditAPIView.as_view()
+    ),
+    path(
+        "billing-history/",
+        BillingHistoryAPIView.as_view()
+    ),
+    path(
+        "subscription-history/",
+        SubscriptionHistoryAPIView.as_view()
+    ),
+    path(
+    "interviews/<int:interview_id>/reschedule/",
+    InterviewRescheduleRequestView.as_view(),
+    name="interview-reschedule",
+),
 
 path(
-    'user-growth/',
-    UserGrowthAPI.as_view()
+    "reschedule-requests/<int:request_id>/approve/",
+    ApproveInterviewRescheduleView.as_view(),
+    name="approve-reschedule",
 ),
 
 path(
-    'job-activity/',
-    JobActivityAPI.as_view()
-),
-path(
-    'ats-match/<int:job_id>/',
-    ATSMatchAPI.as_view()
-),
-path(
-    'ranked-candidates/',
-    RankedCandidatesAPI.as_view()
-),
-path(
-    'eligibility/<int:job_id>/',
-    EligibilityAPI.as_view()
-),
-path(
-    'notification-logs/',
-    NotificationLogsAPI.as_view()
-),
-path(
-    'check-eligibility/<int:candidate_id>/',
-    EligibilityCheckAPIView.as_view()
-),
-path(
-    'trigger-ai-call/<int:candidate_id>/',
-    TriggerAICallAPIView.as_view()
-),
-
-path(
-    'call-status/',
-    CallStatusAPIView.as_view()
-),
-path(
-    'submit-answer/',
-    SubmitAnswerAPIView.as_view()
-),
-path(
-    'evaluate-answer/<int:answer_id>/',
-    EvaluateAnswerAPIView.as_view()
-),
-path(
-    'evaluation-results/',
-    EvaluationResultsAPIView.as_view()
-),
-path(
-    'schedule-interview/<int:candidate_id>/',
-    ScheduleInterviewAPIView.as_view()
-),
-path(
-    'send-reminder/<int:schedule_id>/',
-    SendReminderAPIView.as_view()
-),
-path(
-    'reminder-logs/',
-    ReminderLogsAPIView.as_view()
-),
-path(
-    'candidate-report/<int:candidate_id>/',
-    CandidateReportAPIView.as_view()
-),
-path(
-    'funnel-metrics/',
-    FunnelMetricsAPIView.as_view()
-),
-
-path(
-    'analytics/',
-    AnalyticsAPIView.as_view()
-),
-
-path(
-    'job-performance/',
-    JobPerformanceAPIView.as_view()
-),
-path(
-    "subscription-status/",
-    SubscriptionStatusAPIView.as_view()
-),
-path(
-    "premium-report/",
-    PremiumReportAPIView.as_view()
-),
-path(
-    "premium-candidate-ranking/",
-    PremiumCandidateRankingAPIView.as_view()
-),
-path(
-    "candidate-prediction/",
-    CandidatePredictionAPIView.as_view()
-),
-path(
-    "hiring-efficiency/",
-    HiringEfficiencyAPIView.as_view()
-),
-path(
-    "transactions/",
-    TransactionListAPIView.as_view()
-),
-path(
-    "daily-revenue/",
-    DailyRevenueAPIView.as_view()
-),
-path(
-    "monthly-revenue/",
-    MonthlyRevenueAPIView.as_view()
-),
-path(
-    "plan-revenue/",
-    PlanRevenueAPIView.as_view()
-),
-path(
-    "refund/<int:transaction_id>/",
-    RefundAPIView.as_view()
-),
-path(
-    "financial-audit/",
-    FinancialAuditAPIView.as_view()
-),
-path(
-    "billing-history/",
-    BillingHistoryAPIView.as_view()
-),
-path(
-    "subscription-history/",
-    SubscriptionHistoryAPIView.as_view()
+    "reschedule-requests/<int:request_id>/reject/",
+    RejectInterviewRescheduleView.as_view(),
+    name="reject-reschedule",
 ),
 
 ]

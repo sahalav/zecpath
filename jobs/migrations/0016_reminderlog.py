@@ -14,11 +14,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ReminderLog',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('reminder_type', models.CharField(max_length=50)),
                 ('status', models.CharField(default='sent', max_length=50)),
                 ('sent_at', models.DateTimeField(auto_now_add=True)),
-                ('schedule', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.interviewschedule')),
+                ('schedule', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.interviewschedule')),
             ],
         ),
     ]

@@ -13,6 +13,8 @@ class QuestionEngine:
             q.question.question_text
             for q in questions
         ]
+
+
 class AIFlowManager:
 
     def next_question(
@@ -21,6 +23,7 @@ class AIFlowManager:
     ):
 
         return current_index + 1
+
 
 class AIBridgeService:
 
@@ -40,6 +43,7 @@ class AIBridgeService:
             "score": 80
         }
 
+
 class VoiceCallService:
 
     def trigger_call(
@@ -51,6 +55,8 @@ class VoiceCallService:
             "status":
             "call_initiated"
         }
+
+
 def has_feature(subscription, feature):
 
     plans = {

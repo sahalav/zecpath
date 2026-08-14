@@ -12,20 +12,20 @@ class Job(models.Model):
     )
 
     title = models.CharField(
-    max_length=255,
-    db_index=True
-)
+        max_length=255,
+        db_index=True
+    )
     description = models.TextField()
     company = models.CharField(max_length=255)
 
     skills = models.CharField(
-    max_length=255,
-    db_index=True
-)
+        max_length=255,
+        db_index=True
+    )
     location = models.CharField(
-    max_length=255,
-    db_index=True
-)
+        max_length=255,
+        db_index=True
+    )
 
     salary = models.IntegerField()
     experience = models.IntegerField()
@@ -40,13 +40,15 @@ class Job(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     employer = models.ForeignKey(
-    User,
-    on_delete=models.CASCADE,
-    limit_choices_to={'role': 'employer'}
-)
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'role': 'employer'}
+    )
 
     def __str__(self):
         return self.title
+
+
 class Meta:
     indexes = [
         models.Index(fields=["salary"]),
@@ -60,12 +62,12 @@ class Meta:
 class Application(models.Model):
 
     STATUS_CHOICES = (
-    ('applied', 'Applied'),
-    ('shortlisted', 'Shortlisted'),
-    ('interview', 'Interview Scheduled'),
-    ('selected', 'Selected'),
-    ('rejected', 'Rejected'),
-)
+        ('applied', 'Applied'),
+        ('shortlisted', 'Shortlisted'),
+        ('interview', 'Interview Scheduled'),
+        ('selected', 'Selected'),
+        ('rejected', 'Rejected'),
+    )
 
     candidate = models.ForeignKey(
         User,
@@ -87,6 +89,8 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.candidate.email} - {self.job.title}"
+
+
 class SavedJob(models.Model):
 
     candidate = models.ForeignKey(
@@ -105,6 +109,8 @@ class SavedJob(models.Model):
 
     def __str__(self):
         return f"{self.candidate.email} saved {self.job.title}"
+
+
 class AuditLog(models.Model):
 
     ACTION_CHOICES = (
@@ -140,6 +146,8 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f"{self.admin.email} - {self.action}"
+
+
 class ATSScore(models.Model):
 
     candidate = models.ForeignKey(
@@ -158,6 +166,8 @@ class ATSScore(models.Model):
         max_length=50,
         default='pending'
     )
+
+
 class NotificationLog(models.Model):
 
     user = models.ForeignKey(
@@ -178,6 +188,8 @@ class NotificationLog(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class AICall(models.Model):
 
     STATUS_CHOICES = (
@@ -209,6 +221,8 @@ class AICall(models.Model):
 
     def __str__(self):
         return f"{self.candidate.email} - {self.status}"
+
+
 class AIInterviewSession(models.Model):
 
     candidate = models.ForeignKey(
@@ -234,6 +248,8 @@ class AIInterviewSession(models.Model):
         null=True,
         blank=True
     )
+
+
 class AIQuestion(models.Model):
 
     session = models.ForeignKey(
@@ -246,6 +262,8 @@ class AIQuestion(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class AIAnswer(models.Model):
 
     question = models.ForeignKey(
@@ -258,6 +276,8 @@ class AIAnswer(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class CallLog(models.Model):
 
     candidate = models.ForeignKey(
@@ -284,6 +304,8 @@ class CallLog(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class QuestionTemplate(models.Model):
 
     CATEGORY_CHOICES = (
@@ -303,6 +325,8 @@ class QuestionTemplate(models.Model):
 
     def __str__(self):
         return self.question_text
+
+
 class JobQuestion(models.Model):
 
     job = models.ForeignKey(
@@ -317,6 +341,8 @@ class JobQuestion(models.Model):
 
     def __str__(self):
         return f"{self.job.title}"
+
+
 class InterviewState(models.Model):
 
     session = models.ForeignKey(
@@ -327,6 +353,8 @@ class InterviewState(models.Model):
     current_question_index = models.IntegerField(
         default=0
     )
+
+
 class InterviewAnswer(models.Model):
 
     candidate = models.ForeignKey(
@@ -350,6 +378,8 @@ class InterviewAnswer(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class EvaluationResult(models.Model):
 
     answer = models.ForeignKey(
@@ -364,6 +394,8 @@ class EvaluationResult(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class InterviewSchedule(models.Model):
 
     candidate = models.ForeignKey(
@@ -388,6 +420,47 @@ class InterviewSchedule(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+class InterviewRescheduleRequest(models.Model):
+
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    )
+
+    interview = models.ForeignKey(
+        InterviewSchedule,
+        on_delete=models.CASCADE,
+        related_name="reschedule_requests"
+    )
+
+    requested_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="reschedule_requests"
+    )
+
+    old_date = models.DateField()
+    old_time = models.TimeField()
+
+    new_date = models.DateField()
+    new_time = models.TimeField()
+
+    reason = models.TextField(blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.interview} - {self.status}"
+
+
 class AvailabilitySlot(models.Model):
 
     employer = models.ForeignKey(
@@ -404,6 +477,8 @@ class AvailabilitySlot(models.Model):
     is_booked = models.BooleanField(
         default=False
     )
+
+
 class ReminderLog(models.Model):
 
     schedule = models.ForeignKey(
@@ -423,6 +498,8 @@ class ReminderLog(models.Model):
     sent_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class Subscription(models.Model):
 
     PLAN_CHOICES = (
@@ -455,6 +532,8 @@ class Subscription(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.plan_name}"
+
+
 class PaymentTransaction(models.Model):
 
     STATUS_CHOICES = (
@@ -463,11 +542,11 @@ class PaymentTransaction(models.Model):
         ("REFUNDED", "Refunded")
     )
 
-    user =models.ForeignKey(
-    settings.AUTH_USER_MODEL,
-    on_delete=models.CASCADE,
-    related_name="job_transactions"
-)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="job_transactions"
+    )
 
     amount = models.DecimalField(
         max_digits=10,
@@ -495,6 +574,8 @@ class PaymentTransaction(models.Model):
 
     def __str__(self):
         return self.transaction_id
+
+
 class RefundLog(models.Model):
 
     transaction = models.ForeignKey(
@@ -512,6 +593,8 @@ class RefundLog(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True
     )
+
+
 class FinancialAuditLog(models.Model):
 
     event = models.CharField(

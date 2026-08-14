@@ -14,11 +14,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='EvaluationResult',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('score', models.FloatField()),
                 ('remarks', models.TextField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('answer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='jobs.interviewanswer')),
+                ('answer', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to='jobs.interviewanswer')),
             ],
         ),
     ]

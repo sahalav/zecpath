@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -8,9 +8,10 @@ from rest_framework.generics import ListAPIView
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import PyPDF2
-import pdfplumber
+
 import docx
 import re
+from drf_yasg.utils import swagger_auto_schema
 
 from io import BytesIO
 from services.auth_service import create_user
@@ -122,7 +123,11 @@ class CandidateView(APIView):
 # -------------------------
 # Candidate Profile CRUD
 # -------------------------
-@api_view(['POST'])
+@swagger_auto_schema(
+    method="post",
+    request_body=CandidateProfileSerializer
+)
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_candidate_profile(request):
 
@@ -136,13 +141,10 @@ def create_candidate_profile(request):
     )
 
     if serializer.is_valid():
-
         serializer.save(user=request.user)
-
         return Response(serializer.data)
 
     return Response(serializer.errors)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -244,6 +246,8 @@ def upload_resume(request):
         "message": "Resume uploaded successfully",
         "file": profile.resume.url
     })
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def download_resume(request):
@@ -265,6 +269,8 @@ def download_resume(request):
             {"error": "Candidate profile not found"},
             status=404
         )
+
+
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def delete_resume(request):
@@ -410,6 +416,8 @@ class FlaggedUsersAPI(APIView):
             })
 
         return Response(data)
+
+
 class ResumeParserAPI(APIView):
 
     authentication_classes = [JWTAuthentication]
@@ -493,10 +501,10 @@ class ResumeParserAPI(APIView):
         # Experience Extraction
         # -------------------------
         experience = re.findall(
-       r'(\d+\+?\s+(?:years?|yrs?))',
-    cleaned_text,
-    re.IGNORECASE
-)
+            r'(\d+\+?\s+(?:years?|yrs?))',
+            cleaned_text,
+            re.IGNORECASE
+        )
 
         # -------------------------
         # Education Extraction

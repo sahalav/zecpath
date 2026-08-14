@@ -15,11 +15,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Resume',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', models.FileField(upload_to='resumes/')),
                 ('uploaded_at', models.DateTimeField(auto_now_add=True)),
                 ('extracted_text', models.TextField(blank=True, null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

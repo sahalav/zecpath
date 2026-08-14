@@ -44,7 +44,6 @@ class User(AbstractUser):
     is_approved = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     is_flagged = models.BooleanField(default=False)
-    
 
 
 class CandidateProfile(models.Model):
@@ -74,6 +73,8 @@ class EmployerProfile(models.Model):
 
     def __str__(self):
         return self.user.email
+
+
 class Resume(models.Model):
 
     user = models.ForeignKey(

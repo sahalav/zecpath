@@ -58,9 +58,8 @@ INSTALLED_APPS = [
     'payments',
     'storages',
     'rest_framework_simplejwt.token_blacklist',
-     'drf_yasg',
+    'drf_yasg',
 ]
-
 
 
 MIDDLEWARE = [
@@ -74,7 +73,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-    
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -232,4 +231,15 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "zecpath-cache",
     }
+}
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT Authorization. Example: Bearer <access_token>",
+        }
+    },
+    "USE_SESSION_AUTH": False,
 }

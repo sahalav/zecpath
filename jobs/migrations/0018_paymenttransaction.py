@@ -16,13 +16,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentTransaction',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
                 ('transaction_id', models.CharField(max_length=255, unique=True)),
-                ('payment_gateway', models.CharField(default='Razorpay', max_length=50)),
-                ('status', models.CharField(choices=[('SUCCESS', 'Success'), ('FAILED', 'Failed'), ('REFUNDED', 'Refunded')], max_length=20)),
+                ('payment_gateway', models.CharField(
+                    default='Razorpay', max_length=50)),
+                ('status', models.CharField(choices=[
+                 ('SUCCESS', 'Success'), ('FAILED', 'Failed'), ('REFUNDED', 'Refunded')], max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='job_transactions', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='job_transactions', to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

@@ -16,12 +16,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='job',
             name='employer',
-            field=models.ForeignKey(default=1, limit_choices_to={'role': 'employer'}, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(default=1, limit_choices_to={
+                                    'role': 'employer'}, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
             preserve_default=False,
         ),
         migrations.AlterField(
             model_name='application',
             name='status',
-            field=models.CharField(choices=[('applied', 'Applied'), ('shortlisted', 'Shortlisted'), ('interview', 'Interview Scheduled'), ('selected', 'Selected'), ('rejected', 'Rejected')], default='applied', max_length=20),
+            field=models.CharField(choices=[('applied', 'Applied'), ('shortlisted', 'Shortlisted'), (
+                'interview', 'Interview Scheduled'), ('selected', 'Selected'), ('rejected', 'Rejected')], default='applied', max_length=20),
         ),
     ]
