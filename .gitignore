@@ -22,3 +22,5 @@ media/
 # Logs
 *.log
 backup.sql
+# Collected static files
+staticfiles/
